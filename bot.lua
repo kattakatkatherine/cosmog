@@ -23,11 +23,11 @@ entry = {
 	{command = 'invite', content = 'https://discord.com/api/oauth2/authorize?client_id=711547275410800701&permissions=8&scope=bot', type = 'message', description = 'Grabs Cosmog\'s invite link.', usage = 'invite'},
 	{command = 'say', type = 'message', alias = 'echo', description = 'Says something.', usage = 'say [text]'},
 	{command = 'avatar', type = 'embed', alias = 'pfp', description = 'Gets a user\'s profile picture.', usage = 'avatar (mention)'},
-	{command = 'emote', type = 'embed', alias = 'emoji', description = 'Gets an emote as an image.', usage = 'emote [emote]'},
+	{command = 'emote', alias = 'emoji', description = 'Gets an emote as an image.', usage = 'emote [emote]'},
 	{command = 'random', type = 'message', alias = 'rand', description = 'Gets a random number between two integers.', usage = 'random [integer], [integer]'},
 	{command = 'pick', type = 'message', alias = 'choose', description = 'Picks between multiple options.', usage = 'pick [option] or [option]'},
-	{command = 'server', type = 'embed', alias = 'guild', description = 'Gets information about the server.', usage = 'server [option]', note = 'Options include \"icon,\" \"banner,\" \"splash,\" \"owner,\" \"members,\" and \"name.\"'},
-	{command = 'poll', type = 'embed', alias = 'vote', description = 'Creates a poll.', usage = 'poll [{question}] [{option}] [{option}]'},
+	{command = 'server', alias = 'guild', description = 'Gets information about the server.', usage = 'server [option]', note = 'Options include \"icon,\" \"banner,\" \"splash,\" \"owner,\" \"members,\" and \"name.\"'},
+	{command = 'poll', alias = 'vote', description = 'Creates a poll.', usage = 'poll [{question}] [{option}] [{option}]'},
 	{command = 'prefix', type = 'message', description = 'Changes the bot\'s prefix.', usage = 'prefix [option]', perms = 8},
 	{command = 'welcome', type = 'message', description = 'Configures a welcome message.', usage = 'welcome [channel] [message]', note = '\"$server$\" and \"$user$\" are replaced with the server name and the new user, respectively.', perms = 8},
 	{command = 'remind', type = 'message', alias = 'reminder', description = 'Sends a reminder.', usage = 'remind [duration] [message]', note = 'Duration is in minutes.'},
@@ -118,9 +118,10 @@ end
 
 function help(content)
 	if content:find(' ') then
+		local content = content:sub(content:find(' ') + 1)
 		local tfields = {}
 		for i = 1, table.maxn(entry), 1 do
-			if content:sub(content:find(' ') + 1) == entry[i]['command'] or entry[i]['alias'] and content:sub(content:find(' ') + 1) == entry[i]['alias'] then
+			if content:sub(1, #entry[i]['command']) == entry[i]['command'] or entry[i]['alias'] and content:sub(1, #entry[i]['alias']) == entry[i]['alias'] then
 				ttitle = entry[i]['command']:gsub('^%l', string.upper)
 				tfields[1] = {name = 'Description', value = entry[i]['description'], inline = false}
 				tfields[2] = {name = 'Usage', value = currentPrefix .. entry[i]['usage'], inline = false}
@@ -142,11 +143,10 @@ function help(content)
 end
 
 function helpSummary()
-	local tfields = {}
+	entry[3]['content'] = {title = 'Help', fields = {}}
 	for i = 1, table.maxn(entry), 1 do
-		tfields[i] = {name = entry[i]['command'], value = entry[i]['description'], inline = false}
+		entry[3]['content']['fields'][i] = {name = entry[i]['command'], value = entry[i]['description'], inline = false}
 	end
-	entry[3]['content'] = {title = 'Help', fields = tfields}
 end
 
 function say(content, message)
@@ -159,11 +159,11 @@ function say(content, message)
 end
 
 function avatar(mention, author)
+	local target = author
 	if mention then
-		entry[6]['content'] = {image = {url = mention:getAvatarURL() .. '?size=1024'}}
-	else
-		entry[6]['content'] = {image = {url = author:getAvatarURL() .. '?size=1024'}}
+		target = mention
 	end
+	entry[6]['content'] = {image = {url = target:getAvatarURL() .. '?size=1024'}}
 end
 
 function emote(emote, content)
@@ -182,15 +182,13 @@ end
 
 function random(content)
 	if content:find(', ') and not content:sub(content:find(' ') + 1):match('[^0-9, %-]') then
-		math.randomseed(os.time())
-		firstNumber = content:sub(content:find(' ') + 1, content:find(', ') - 1)
-		content = content:sub(content:find(', ') + 2)
+		local secondNumber
+		secondNumber = content:sub(content:find(', ') + 2)
 		if(content:find('[, ]')) then
-			secondNumber = content:sub(1, content:find(content:match('[^0-9]')) - 1)
-		else
-			secondNumber = content
+			secondNumber = secondNumber:sub(1, secondNumber:find(secondNumber:match('[^0-9]')) - 1)
 		end
-		entry[8]['content'] = math.random(firstNumber, secondNumber)
+		math.randomseed(os.time())
+		entry[8]['content'] = math.random(content:sub(content:find(' ') + 1, content:find(', ') - 1), secondNumber)
 	else
 		entry[8]['content'] = 'What range would you like to use?'
 	end
@@ -204,11 +202,10 @@ function pick(content)
 		tcontent = tcontent:sub(tcontent:find(' or ') + 4)
 	end
 	toptions[table.maxn(toptions) + 1] = tcontent
+	entry[9]['content'] = 'Make sure to separate the options with \"or.\"'
 	if table.maxn(toptions) ~= 0 then
 		math.randomseed(os.time())
 		entry[9]['content'] = 'I pick... ' .. toptions[math.random(1, table.maxn(toptions))]
-	else
-		entry[9]['content'] = 'Make sure to separate the options with \"or\"'
 	end
 end
 
@@ -217,9 +214,9 @@ function server(content, server)
 	if content:find(' ') then
 
 		tentry = {
-			{option = 'icon', type = 'image', content = server.iconURL, fail = 'It doesn\'t look like this server has an icon...'},
-			{option = 'banner', type = 'image', content = server.bannerURL, fail = 'It doesn\'t look like this server has a banner...'},
-			{option = 'splash', type = 'image', content = server.splashURL, fail = 'It doesn\'t look like this server has a splash image...'},
+			{option = 'icon', type = 'image', content = server.iconURL, fail = 'an icon'},
+			{option = 'banner', type = 'image', content = server.bannerURL, fail = 'a banner'},
+			{option = 'splash', type = 'image', content = server.splashURL, fail = 'a splash image'},
 			{option = 'owner', type = 'message', content = server.owner.user.tag .. ' owns this server.'},
 			{option = 'members', type = 'message', content = tostring(server.totalMemberCount) .. ' users are in this server.'},
 			{option = 'name', type = 'message', content = 'This server is called ' .. server.name .. '.'},
@@ -227,6 +224,7 @@ function server(content, server)
 
 		for i = 1, table.maxn(tentry), 1 do
 			if content:sub(content:find(' ') + 1) == tentry[i]['option'] then
+				entry[10]['content'] = 'It doesn\'t look like this server has ' .. tentry[i]['fail'] .. '...'
 				if tentry[i]['content'] then
 					if tentry[i]['type'] == 'image' then
 						entry[10]['type'] = 'embed'
@@ -234,8 +232,6 @@ function server(content, server)
 					elseif tentry[i]['type'] == 'message' then
 						entry[10]['content'] = tentry[i]['content']
 					end
-				else
-					entry[10]['content'] = tentry[i]['fail']
 				end
 				return
 			elseif i == table.maxn(tentry) then
@@ -260,30 +256,26 @@ function serverSummary(server)
 end
 
 function poll(content)
+	entry[11]['code'] = 0
+	entry[11]['type'] = 'message'
+	entry[11]['content'] = 'Please surround the question with curly brackets.'
 	if content:find('{') and content:find('}') and content:find('{') < content:find('}') then
-		entry[11]['type'] = 'embed'
-		entry[11]['code'] = 0
-
 		local tquestion = content:sub(content:find('{') + 1, content:find('}') - 1)
 		local tcontent = content:sub(content:find('}') + 1)
 		local i = 0
 		local toptions = ''
-		entry[11]['emotes'] = {'🇦','🇧','🇨','🇩','🇪','🇫','🇬','🇭','🇮','🇯','🇰','🇱','🇲','🇳','🇴','🇵','🇶','🇷','🇸','🇹'}
+		local emotes = {'🇦','🇧','🇨','🇩','🇪','🇫','🇬','🇭','🇮','🇯','🇰','🇱','🇲','🇳','🇴','🇵','🇶','🇷','🇸','🇹'}
 
 		while tcontent:find('{') and tcontent:find('}') and i <= 20 do
-				i = i + 1
-				toptions = toptions .. '\n\n'..entry[11]['emotes'][i] .. ' ' .. tcontent:sub(tcontent:find('{') + 1, tcontent:find('}') - 1)
-				tcontent = tcontent:sub(tcontent:find('}') + 1)
-				entry[11]['code'] = i
+			i = i + 1
+			toptions = toptions .. '\n\n'..emotes[i] .. ' ' .. tcontent:sub(tcontent:find('{') + 1, tcontent:find('}') - 1)
+			tcontent = tcontent:sub(tcontent:find('}') + 1)
+			entry[11]['code'] = i
 		end
 
-		entry[11]['content'] = {
-			title = tquestion,
-			description = toptions
-		}
-	else
-		entry[11]['type'] = 'message'
-		entry[11]['content'] = 'Please surround the question with curly brackets.'
+		message:delete()
+		entry[11]['type'] = 'embed'
+		entry[11]['content'] = {title = tquestion, description = toptions}
 	end
 end
 
@@ -294,12 +286,11 @@ function prefix(content, server, bot)
 		entry[12]['content'] = 'Changed this server\'s prefix to ' .. currentPrefix
 		nickManage(bot)
 	else
-		entry[12]['content'] = 'What would you like to change the server\'s prefix to?'
+		entry[12]['content'] = 'What would you like this server\'s prefix to be?'
 	end
 end
 
 function welcome(channel, content, server)
-	file = io.open('welcome.lua', 'w+')
 	if channel then
 		if #content:sub(content:find(channel.mentionString) + #channel.mentionString) > 0 then
 			welcomeChannel = channel.id
@@ -319,11 +310,12 @@ function remind(content, mention, message)
 	if content:find(' ') then
 		local timer = require('timer')
 		local duration = content:sub(content:find(' ') + 1, content:sub(content:find(' ') + 1):find('[^.0-9]') + content:find(' ') - 1)
-		if duration:match('[0-9]') == duration then
+		if duration:match('[%.0-9]+') == duration then
 			entry[14]['content'] = 'Your reminder has been set!'
 			output(14, message.channel, message, message.guild:getMember(client.user.id))
+
 			timer.sleep(duration * 60000)
-			entry[14]['content'] = mention .. ' ' .. content:sub(content:find(duration) + #duration)
+			entry[14]['content'] = '**Reminder** ' .. mention .. ':' .. content:sub(content:find(duration) + #duration)
 		else
 			entry[14]['content'] = 'When would you like me to remind you?'
 		end
@@ -334,10 +326,9 @@ end
 
 --send the message
 function output(i, channel, message, bot)
+	local sentID
 	if entry[i]['type'] == 'message' then
 		sentID = channel:send(entry[i]['content'])
-	elseif entry[i]['type'] == 'file' then
-		sentID = channel:send{file = entry[i]['content']}
 	elseif entry[i]['type'] == 'embed' then
 		entry[i]['content']['color'] = discordia.Color.fromRGB(32, 102, 148).value
 		sentID = channel:send{embed = entry[i]['content']}
@@ -368,29 +359,28 @@ end
 --reads from config file
 function read(server, option, default)
 	local file = io.open('config.json', 'r')
-	local search = file:read('*a')
-	local decoded = json.decode(search)
+	local decoded = json.decode(file:read('*a'))
+	local variable = default
+
 	if decoded[server] and decoded[server][option] then
 		variable = decoded[server][option]
-	else
-		variable = default
 	end
+
 	file:close()
 	return variable
 end
 
 --$prefix changes bot's nickname
 function nickManage(bot)
+	local nickname = nil
 	if currentPrefix ~= '$' then
-		bot:setNickname('Cosmog [' .. currentPrefix .. ']')
-	else
-		bot:setNickname()
+		nickname = 'Cosmog [' .. currentPrefix .. ']'
 	end
+	bot:setNickname(nickname)
 end
 
 --$poll deletes the initial message and adds reactions
 function pollReact(message, sentID)
-	message:delete()
 	if entry[11]['code'] > 0 then
 		for i = 1,entry[11]['code'],1 do
 			sentID:addReaction(entry[11]['emotes'][i])
@@ -398,4 +388,5 @@ function pollReact(message, sentID)
 	end
 end
 
+--token stored in outside file
 client:run('Bot ' .. io.open('../token.txt'):read())
