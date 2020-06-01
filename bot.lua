@@ -57,11 +57,17 @@ client:on('messageCreate', function(message)
 				end
 			end
 
+			--allow for accidental double spaces
+			local cleanContent = message.content:gsub('  ', ' ')
+			while cleanContent:find('  ') do
+				cleanContent = cleanContent:gsub('  ', ' ')
+			end
+
 			--dynamic commands
 			if i == 2 then
 				info(tostring(#client.guilds), client:getUser(client.user.id):getAvatarURL() .. '?size=1024')
 			elseif i == 3 then
-				help(message.content)
+				help(cleanContent)
 			elseif i == 5 then
 				say(message.content, message)
 			elseif i == 6 then
@@ -69,13 +75,13 @@ client:on('messageCreate', function(message)
 			elseif i == 7 then
 				emote(message.mentionedEmojis.first, message.content)
 			elseif i == 8 then
-				random(message.content)
+				random(cleanContent)
 			elseif i == 9 then
 				pick(message.content)
 			elseif i == 10 then
-				server(message.content, message.guild)
+				server(cleanContent, message.guild)
 			elseif i == 11 then
-				poll(message.content)
+				poll(message.content, message)
 			elseif i == 12 then
 				prefix(message.content, message.guild.id, message.guild:getMember(client.user.id))
 			elseif i == 13 then
@@ -184,7 +190,7 @@ function random(content)
 	if content:find(', ') and not content:sub(content:find(' ') + 1):match('[^0-9, %-]') then
 		local secondNumber
 		secondNumber = content:sub(content:find(', ') + 2)
-		if(content:find('[, ]')) then
+		if(secondNumber:find('[, ]')) then
 			secondNumber = secondNumber:sub(1, secondNumber:find(secondNumber:match('[^0-9]')) - 1)
 		end
 		math.randomseed(os.time())
@@ -224,7 +230,6 @@ function server(content, server)
 
 		for i = 1, table.maxn(tentry), 1 do
 			if content:sub(content:find(' ') + 1) == tentry[i]['option'] then
-				entry[10]['content'] = 'It doesn\'t look like this server has ' .. tentry[i]['fail'] .. '...'
 				if tentry[i]['content'] then
 					if tentry[i]['type'] == 'image' then
 						entry[10]['type'] = 'embed'
@@ -232,6 +237,8 @@ function server(content, server)
 					elseif tentry[i]['type'] == 'message' then
 						entry[10]['content'] = tentry[i]['content']
 					end
+				else
+					entry[10]['content'] = 'It doesn\'t look like this server has ' .. tentry[i]['fail'] .. '...'
 				end
 				return
 			elseif i == table.maxn(tentry) then
@@ -255,7 +262,7 @@ function serverSummary(server)
 	end
 end
 
-function poll(content)
+function poll(content, message)
 	entry[11]['code'] = 0
 	entry[11]['type'] = 'message'
 	entry[11]['content'] = 'Please surround the question with curly brackets.'
@@ -264,7 +271,7 @@ function poll(content)
 		local tcontent = content:sub(content:find('}') + 1)
 		local i = 0
 		local toptions = ''
-		local emotes = {'🇦','🇧','🇨','🇩','🇪','🇫','🇬','🇭','🇮','🇯','🇰','🇱','🇲','🇳','🇴','🇵','🇶','🇷','🇸','🇹'}
+		emotes = {'🇦','🇧','🇨','🇩','🇪','🇫','🇬','🇭','🇮','🇯','🇰','🇱','🇲','🇳','🇴','🇵','🇶','🇷','🇸','🇹'}
 
 		while tcontent:find('{') and tcontent:find('}') and i <= 20 do
 			i = i + 1
@@ -383,7 +390,7 @@ end
 function pollReact(message, sentID)
 	if entry[11]['code'] > 0 then
 		for i = 1,entry[11]['code'],1 do
-			sentID:addReaction(entry[11]['emotes'][i])
+			sentID:addReaction(emotes[i])
 		end
 	end
 end
