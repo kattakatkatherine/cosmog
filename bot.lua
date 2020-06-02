@@ -31,11 +31,25 @@ entry = {
 	{command = 'prefix', type = 'message', description = 'Changes the bot\'s prefix.', usage = 'prefix [option]', perms = 8},
 	{command = 'welcome', type = 'message', description = 'Configures a welcome message.', usage = 'welcome [channel] [message]', note = '\"$server$\" and \"$user$\" are replaced with the server name and the new user, respectively.', perms = 8},
 	{command = 'remind', type = 'message', alias = 'reminder', description = 'Sends a reminder.', usage = 'remind [duration] [message]', note = 'Duration is in minutes.'},
+	{command = 'filter', description = 'Manages the list of filtered words.', usage = 'filter [option] (word)', note = 'Options include \"add,\" \"remove,\" \"list,\" and \"clear.\"', perms = 8},
 	[0] = {} --left blank
 }
 
 
 client:on('messageCreate', function(message)
+
+	--deletes words with filtered terms
+	filterList = read(message.guild.id, 'filter', false)
+	if filterList then
+		for i = 1, table.maxn(filterList), 1 do
+			if message.content:lower():find(filterList[i]:lower()) and not message.member:hasPermission(8) then
+				message:delete()
+			end
+		end
+	else
+		filterList = {}
+		write(message.guild.id, 'filter', {})
+	end
 
 	--check prefix
 	currentPrefix = read(message.guild.id, 'prefix', '$')
@@ -69,7 +83,7 @@ client:on('messageCreate', function(message)
 			elseif i == 3 then
 				help(cleanContent)
 			elseif i == 5 then
-				say(message.content, message)
+				say(message.author.bot, message.content, message)
 			elseif i == 6 then
 				avatar(message.mentionedUsers.first, message.author)
 			elseif i == 7 then
@@ -88,6 +102,8 @@ client:on('messageCreate', function(message)
 				welcome(message.mentionedChannels.first, message.content, message.guild.id)
 			elseif i == 14 then
 				remind(message.content, message.author.mentionString, message)
+			elseif i == 15 then
+				filter(message.guild.id, message.content)
 			end
 
 			--send message
@@ -155,12 +171,16 @@ function helpSummary()
 	end
 end
 
-function say(content, message)
-	if content:find(' ') then
-		entry[5]['content'] = content:sub(content:find(' ') + 1)
-		message:delete()
+function say(bot, content, message)
+	if not bot then
+		if content:find(' ') then
+			entry[5]['content'] = content:sub(content:find(' ') + 1)
+			message:delete()
+		else
+			entry[5]['content'] = 'What should I say?'
+		end
 	else
-		entry[5]['content'] = 'What should I say?'
+		entry[5]['content'] = ''
 	end
 end
 
@@ -320,7 +340,7 @@ function remind(content, mention, message)
 		if duration:match('[%.0-9]+') == duration then
 			entry[14]['content'] = 'Your reminder has been set!'
 			output(14, message.channel, message, message.guild:getMember(client.user.id))
-
+			--send confirmation, then wait
 			timer.sleep(duration * 60000)
 			entry[14]['content'] = '**Reminder** ' .. mention .. ':' .. content:sub(content:find(duration) + #duration)
 		else
@@ -329,6 +349,37 @@ function remind(content, mention, message)
 	else
 		entry[14]['content'] = 'When would you like me to remind you?'
 	end
+end
+
+function filter(server, content, channel)
+	filterList = read(server, 'filter', false)
+	entry[15]['type'] = 'message'
+	if content:find('$filter add ') then
+		filterList[table.maxn(filterList) + 1] = content:sub(content:find('$filter add ') + #'$filter add '):lower()
+		entry[15]['content'] = 'The above word has been added to the filter list.'
+	elseif content:find('$filter remove ') then
+		local removeWord = content:sub(content:find('$filter remove ') + #'$filter remove '):lower()
+		for i = 1, table.maxn(filterList), 1 do
+			if removeWord == filterList[i] then
+				table.remove(filterList, i)
+				entry[15]['content'] = '\"' .. removeWord:gsub('^%l', string.upper) .. '\" has been removed from the filter list.'
+			elseif i == table.maxn(filterList) then
+				entry[15]['content'] = 'It appears that \"' .. removeWord .. '\" is not on the filter list.'
+			end
+		end
+	elseif content:find('$filter list') then
+		entry[15]['content'] = {title = 'Filtered Words', description = ''}
+		entry[15]['type'] = 'embed'
+		for i = 1, table.maxn(filterList), 1 do
+			entry[15]['content']['description'] = entry[15]['content']['description'] .. '\n' .. filterList[i]
+		end
+	elseif content:find('$filter clear') then
+		filterList = {}
+		entry[15]['content'] = 'The filter list has been cleared.'
+	else
+		entry[15]['content'] = 'Please choose an option.'
+	end
+	write(server, 'filter', filterList)
 end
 
 --send the message
