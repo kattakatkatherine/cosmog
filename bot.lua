@@ -32,13 +32,15 @@ entry = {
 	{command = 'welcome', type = 'message', description = 'Configures a welcome message.', usage = 'welcome [channel] [message]', note = '\"$server$\" and \"$user$\" are replaced with the server name and the new user, respectively.', perms = 8},
 	{command = 'remind', type = 'message', alias = 'reminder', description = 'Sends a reminder.', usage = 'remind [duration] [message]', note = 'Duration is in minutes.'},
 	{command = 'filter', description = 'Manages the list of filtered words.', usage = 'filter [option] (word)', note = 'Options include \"add,\" \"remove,\" \"list,\" and \"clear.\"', perms = 8},
+	{command = 'coin', type = 'message', alias = 'flip', description = 'Flips a coin.', usage = 'coin'},
+	{command = 'dice', type = 'message', alias = 'roll', description = 'Rolls a dice.', usage = 'dice'},
 	[0] = {} --left blank
 }
 
 
 client:on('messageCreate', function(message)
 
-	--deletes words with filtered terms
+	--delete words with filtered terms
 	filterList = read(message.guild.id, 'filter', false)
 	if filterList then
 		for i = 1, table.maxn(filterList), 1 do
@@ -104,6 +106,10 @@ client:on('messageCreate', function(message)
 				remind(message.content, message.author.mentionString, message)
 			elseif i == 15 then
 				filter(message.guild.id, message.content)
+			elseif i == 16 then
+				coin()
+			elseif i == 17 then
+				dice(message.content)
 			end
 
 			--send message
@@ -113,7 +119,7 @@ client:on('messageCreate', function(message)
 	end
 end)
 
---when someone joins...
+--send welcome message
 client:on('memberJoin', function(member)
 	welcomeChannel = read(member.guild.id, 'welcomeChannel', nil)
 	welcomeMessage = read(member.guild.id, 'welcomeMessage', nil)
@@ -124,7 +130,7 @@ client:on('memberJoin', function(member)
 	end
 end)
 
---restores nickname upon rejoining a server
+--restore nickname upon rejoining a server
 client:on('guildCreate', function(guild)
 	nickManage(guild:getMember(client.user.id))
 end)
@@ -380,6 +386,20 @@ function filter(server, content, channel)
 		entry[15]['content'] = 'Please choose an option.'
 	end
 	write(server, 'filter', filterList)
+end
+
+function coin()
+	math.randomseed(os.time())
+	local result = 'heads ' .. client:getEmoji('717821936163356723').mentionString
+	if math.random(0, 1) == 0 then
+		result = 'tails ' .. client:getEmoji('717821935924543560').mentionString
+	end
+	entry[16]['content'] = 'You got... ' .. result
+end
+
+function dice(content)
+	math.randomseed(os.time())
+	entry[17]['content'] = 'You got... ' .. math.random(1, 6) .. '.'
 end
 
 --send the message
