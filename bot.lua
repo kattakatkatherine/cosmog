@@ -33,7 +33,7 @@ entry = {
 	{command = 'remind', type = 'message', alias = 'reminder', description = 'Sends a reminder.', usage = 'remind [duration] [message]', note = 'Duration is in minutes.'},
 	{command = 'filter', description = 'Manages the list of filtered words.', usage = 'filter [option] (word)', note = 'Options include \"add,\" \"remove,\" \"list,\" and \"clear.\"', perms = 8},
 	{command = 'coin', type = 'message', alias = 'flip', description = 'Flips a coin.', usage = 'coin'},
-	{command = 'dice', type = 'message', alias = 'roll', description = 'Rolls a dice.', usage = 'dice'},
+	{command = 'dice', type = 'message', alias = 'roll', description = 'Rolls dice.', usage = 'dice ((number of dice)[d][number of faces])', note =  'The default roll is 1d6.'},
 	[0] = {} --left blank
 }
 
@@ -186,6 +186,7 @@ function say(bot, content, message)
 			entry[5]['content'] = 'What should I say?'
 		end
 	else
+		--do not respond if a bot sent the message
 		entry[5]['content'] = ''
 	end
 end
@@ -213,14 +214,9 @@ function emote(emote, content)
 end
 
 function random(content)
-	if content:find(', ') and not content:sub(content:find(' ') + 1):match('[^0-9, %-]') then
-		local secondNumber
-		secondNumber = content:sub(content:find(', ') + 2)
-		if(secondNumber:find('[, ]')) then
-			secondNumber = secondNumber:sub(1, secondNumber:find(secondNumber:match('[^0-9]')) - 1)
-		end
+	if content:find('[0-9]+.*,.*[0-9]+') then
 		math.randomseed(os.time())
-		entry[8]['content'] = math.random(content:sub(content:find(' ') + 1, content:find(', ') - 1), secondNumber)
+		entry[8]['content'] = math.random(content:match('%-?[0-9]+'), content:match(',.*(%-?[0-9]+)'))
 	else
 		entry[8]['content'] = 'What range would you like to use?'
 	end
@@ -314,8 +310,7 @@ end
 
 function prefix(content, server, bot)
 	if content:find(' ') then
-		currentPrefix = content:sub(content:find(' ') + 1)
-		write(server, 'prefix', currentPrefix)
+		currentPrefix = write(server, 'prefix', content:match('%s(.+)'))
 		entry[12]['content'] = 'Changed this server\'s prefix to ' .. currentPrefix
 		nickManage(bot)
 	else
@@ -325,11 +320,10 @@ end
 
 function welcome(channel, content, server)
 	if channel then
-		if #content:sub(content:find(channel.mentionString) + #channel.mentionString) > 0 then
-			welcomeChannel = channel.id
-			welcomeMessage = content:sub(content:find(channel.mentionString) + #channel.mentionString)
-			write(server, 'welcomeChannel', welcomeChannel)
-			write(server, 'welcomeMessage', welcomeMessage)
+		if #content:sub(content:find(channel.mentionString) + #channel) > 0 then
+			local welcomeSegment1, welcomeSegment2 = content:match('^$welcome%s*(.*)' .. channel.mentionString .. '%s*(.*)')
+			welcomeChannel = write(server, 'welcomeChannel', channel.id)
+			welcomeMessage = write(server, 'welcomeMessage', welcomeSegment1 .. welcomeSegment2)
 			entry[13]['content'] = 'The welcome message has been set.'
 		else
 			entry[13]['content'] = 'What message would you like me to send?'
@@ -340,18 +334,13 @@ function welcome(channel, content, server)
 end
 
 function remind(content, mention, message)
-	if content:find(' ') then
+	if content:find('[0-9]') then
 		local timer = require('timer')
-		local duration = content:sub(content:find(' ') + 1, content:sub(content:find(' ') + 1):find('[^.0-9]') + content:find(' ') - 1)
-		if duration:match('[%.0-9]+') == duration then
-			entry[14]['content'] = 'Your reminder has been set!'
-			output(14, message.channel, message, message.guild:getMember(client.user.id))
-			--send confirmation, then wait
-			timer.sleep(duration * 60000)
-			entry[14]['content'] = '**Reminder** ' .. mention .. ':' .. content:sub(content:find(duration) + #duration)
-		else
-			entry[14]['content'] = 'When would you like me to remind you?'
-		end
+		entry[14]['content'] = 'Your reminder has been set!'
+		output(14, message.channel, message, message.guild:getMember(client.user.id))
+		--wait before sending reminder
+		timer.sleep(content:match('[0-9]+%.?[0-9]*') * 60000)
+		entry[14]['content'] = '**Reminder** ' .. mention .. content:match('[0-9]+%.?[0-9]*(.*)')
 	else
 		entry[14]['content'] = 'When would you like me to remind you?'
 	end
@@ -398,8 +387,21 @@ function coin()
 end
 
 function dice(content)
-	math.randomseed(os.time())
-	entry[17]['content'] = 'You got... ' .. math.random(1, 6) .. '.'
+	local diceCount = 1
+	local diceType = 6
+	local sum = 0
+	if content:find('[0-9]*d[0-9]+') then
+		if content:find('[0-9]+d') then
+			content = content:match('[0-9]+.*')
+			diceCount = content:match('[0-9]+')
+		end
+		content = content:sub(content:find('d') + 1)
+		diceType = content:match('[0-9]+')
+	end
+	for i = 1, diceCount, 1 do
+		sum = sum + math.random(1, diceType)
+	end
+	entry[17]['content'] = 'You got... ' .. sum .. ' 🎲'
 end
 
 --send the message
@@ -432,6 +434,7 @@ function write(server, option, content)
 	local file = io.open('config.json', 'w+')
 	file:write(encoded)
 	file:close()
+	return content
 end
 
 --reads from config file
