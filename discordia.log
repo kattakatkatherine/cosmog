@@ -7238,3 +7238,157 @@
 2020-06-04 15:56:06 | [INFO]    | Shard 0 : Connected to wss://gateway.discord.gg
 2020-06-04 15:56:06 | [INFO]    | Shard 0 : Received HELLO
 2020-06-04 15:56:06 | [INFO]    | Shard 0 : Received READY
+2020-06-05 11:34:47 | [INFO]    | Discordia 2.8.3
+2020-06-05 11:34:47 | [INFO]    | Connecting to Discord...
+2020-06-05 11:35:27 | [ERROR]   | Could not authenticate, check token: /home/admin/deps/coro-http.lua:74: EAI_AGAIN
+2020-06-05 11:35:30 | [INFO]    | Discordia 2.8.3
+2020-06-05 11:35:30 | [INFO]    | Connecting to Discord...
+2020-06-05 11:35:44 | [INFO]    | Authenticated as Cosmog#7197
+2020-06-05 11:35:44 | [INFO]    | Launching shard 0 (1 out of 1)...
+2020-06-05 11:35:53 | [INFO]    | Shard 0 : Connected to wss://gateway.discord.gg
+2020-06-05 11:35:53 | [INFO]    | Shard 0 : Received HELLO
+2020-06-05 11:35:53 | [INFO]    | Shard 0 : Received READY
+2020-06-05 13:09:15 | [INFO]    | Shard 0 : Disconnected
+2020-06-05 13:09:15 | [INFO]    | Shard 0 : Reconnecting after 914 ms...
+2020-06-05 13:09:41 | [ERROR]   | Shard 0 : Could not connect to wss://gateway.discord.gg (EAI_NONAME)
+2020-06-05 13:09:41 | [INFO]    | Shard 0 : Reconnecting after 1827 ms...
+2020-06-05 13:09:44 | [INFO]    | Shard 0 : Connected to wss://gateway.discord.gg
+2020-06-05 13:09:44 | [INFO]    | Shard 0 : Received HELLO
+2020-06-05 13:09:44 | [INFO]    | Shard 0 : Session invalidated, re-identifying...
+2020-06-05 13:09:47 | [INFO]    | Shard 0 : Received READY
+2020-06-05 13:56:16 | [INFO]    | Discordia 2.8.3
+2020-06-05 13:56:16 | [INFO]    | Connecting to Discord...
+2020-06-05 13:56:16 | [INFO]    | Authenticated as Cosmog#7197
+2020-06-05 13:56:17 | [INFO]    | Launching shard 0 (1 out of 1)...
+2020-06-05 13:56:17 | [INFO]    | Shard 0 : Connected to wss://gateway.discord.gg
+2020-06-05 13:56:17 | [INFO]    | Shard 0 : Received HELLO
+2020-06-05 13:56:17 | [INFO]    | Shard 0 : Received READY
+2020-06-05 13:57:14 | [INFO]    | Discordia 2.8.3
+2020-06-05 13:57:14 | [INFO]    | Connecting to Discord...
+2020-06-05 13:57:15 | [INFO]    | Authenticated as Cosmog#7197
+2020-06-05 13:57:15 | [INFO]    | Launching shard 0 (1 out of 1)...
+2020-06-05 13:57:15 | [INFO]    | Shard 0 : Connected to wss://gateway.discord.gg
+2020-06-05 13:57:15 | [INFO]    | Shard 0 : Received HELLO
+2020-06-05 13:57:15 | [INFO]    | Shard 0 : Received READY
+2020-06-05 14:27:04 | [WARNING] | Shard 0 : Unhandled gateway event: INVITE_CREATE
+2020-06-05 14:42:16 | [ERROR]   | 400 - Bad Request : POST https://discordapp.com/api/v7/channels/718546374336970764/messages
+2020-06-05 14:43:21 | [ERROR]   | 400 - Bad Request : POST https://discordapp.com/api/v7/channels/718546374336970764/messages
+2020-06-05 14:50:33 | [INFO]    | Discordia 2.8.3
+2020-06-05 14:50:33 | [INFO]    | Connecting to Discord...
+2020-06-05 14:50:34 | [INFO]    | Authenticated as Cosmog#7197
+2020-06-05 14:50:34 | [INFO]    | Launching shard 0 (1 out of 1)...
+2020-06-05 14:50:34 | [INFO]    | Shard 0 : Connected to wss://gateway.discord.gg
+2020-06-05 14:50:34 | [INFO]    | Shard 0 : Received HELLO
+2020-06-05 14:50:34 | [INFO]    | Shard 0 : Received READY
+2020-06-05 15:09:42 | [INFO]    | Discordia 2.8.3
+2020-06-05 15:09:42 | [INFO]    | Connecting to Discord...
+2020-06-05 15:09:42 | [INFO]    | Authenticated as Cosmog#7197
+2020-06-05 15:09:42 | [INFO]    | Launching shard 0 (1 out of 1)...
+2020-06-05 15:09:42 | [INFO]    | Shard 0 : Connected to wss://gateway.discord.gg
+2020-06-05 15:09:42 | [INFO]    | Shard 0 : Received HELLO
+2020-06-05 15:09:43 | [INFO]    | Shard 0 : Received READY
+2020-06-05 15:19:26 | [INFO]    | Shard 0 : Disconnected
+2020-06-05 15:19:26 | [INFO]    | Shard 0 : Reconnecting after 988 ms...
+2020-06-05 15:19:27 | [INFO]    | Shard 0 : Connected to wss://gateway.discord.gg
+2020-06-05 15:19:27 | [INFO]    | Shard 0 : Received HELLO
+2020-06-05 15:19:27 | [INFO]    | Shard 0 : Received RESUMED
+2020-06-05 15:20:06 | [INFO]    | Discordia 2.8.3
+2020-06-05 15:20:06 | [INFO]    | Connecting to Discord...
+2020-06-05 15:20:06 | [INFO]    | Authenticated as Cosmog#7197
+2020-06-05 15:20:06 | [INFO]    | Launching shard 0 (1 out of 1)...
+2020-06-05 15:20:06 | [INFO]    | Shard 0 : Connected to wss://gateway.discord.gg
+2020-06-05 15:20:06 | [INFO]    | Shard 0 : Received HELLO
+2020-06-05 15:20:07 | [INFO]    | Shard 0 : Received READY
+2020-06-05 15:20:25 | [ERROR]   | 400 - Bad Request : POST https://discordapp.com/api/v7/channels/711769236183187556/messages
+2020-06-05 15:20:53 | [INFO]    | Discordia 2.8.3
+2020-06-05 15:20:53 | [INFO]    | Connecting to Discord...
+2020-06-05 15:20:53 | [INFO]    | Authenticated as Cosmog#7197
+2020-06-05 15:20:53 | [INFO]    | Launching shard 0 (1 out of 1)...
+2020-06-05 15:20:53 | [INFO]    | Shard 0 : Connected to wss://gateway.discord.gg
+2020-06-05 15:20:53 | [INFO]    | Shard 0 : Received HELLO
+2020-06-05 15:20:53 | [INFO]    | Shard 0 : Received READY
+2020-06-05 15:24:15 | [INFO]    | Discordia 2.8.3
+2020-06-05 15:24:15 | [INFO]    | Connecting to Discord...
+2020-06-05 15:24:16 | [INFO]    | Authenticated as Cosmog#7197
+2020-06-05 15:24:16 | [INFO]    | Launching shard 0 (1 out of 1)...
+2020-06-05 15:24:16 | [INFO]    | Shard 0 : Connected to wss://gateway.discord.gg
+2020-06-05 15:24:16 | [INFO]    | Shard 0 : Received HELLO
+2020-06-05 15:24:16 | [INFO]    | Shard 0 : Received READY
+2020-06-05 15:24:43 | [INFO]    | Discordia 2.8.3
+2020-06-05 15:24:43 | [INFO]    | Connecting to Discord...
+2020-06-05 15:24:43 | [INFO]    | Authenticated as Cosmog#7197
+2020-06-05 15:24:43 | [INFO]    | Launching shard 0 (1 out of 1)...
+2020-06-05 15:24:43 | [INFO]    | Shard 0 : Connected to wss://gateway.discord.gg
+2020-06-05 15:24:43 | [INFO]    | Shard 0 : Received HELLO
+2020-06-05 15:24:43 | [INFO]    | Shard 0 : Received READY
+2020-06-05 15:25:00 | [INFO]    | Discordia 2.8.3
+2020-06-05 15:25:00 | [INFO]    | Connecting to Discord...
+2020-06-05 15:25:01 | [INFO]    | Authenticated as Cosmog#7197
+2020-06-05 15:25:01 | [INFO]    | Launching shard 0 (1 out of 1)...
+2020-06-05 15:25:01 | [INFO]    | Shard 0 : Connected to wss://gateway.discord.gg
+2020-06-05 15:25:01 | [INFO]    | Shard 0 : Received HELLO
+2020-06-05 15:25:01 | [INFO]    | Shard 0 : Received READY
+2020-06-05 15:25:14 | [INFO]    | Discordia 2.8.3
+2020-06-05 15:25:14 | [INFO]    | Connecting to Discord...
+2020-06-05 15:25:14 | [INFO]    | Authenticated as Cosmog#7197
+2020-06-05 15:25:14 | [INFO]    | Launching shard 0 (1 out of 1)...
+2020-06-05 15:25:14 | [INFO]    | Shard 0 : Connected to wss://gateway.discord.gg
+2020-06-05 15:25:14 | [INFO]    | Shard 0 : Received HELLO
+2020-06-05 15:25:15 | [INFO]    | Shard 0 : Received READY
+2020-06-05 15:33:35 | [INFO]    | Shard 0 : Disconnected
+2020-06-05 15:33:35 | [INFO]    | Shard 0 : Reconnecting after 1098 ms...
+2020-06-05 15:33:36 | [INFO]    | Shard 0 : Connected to wss://gateway.discord.gg
+2020-06-05 15:33:36 | [INFO]    | Shard 0 : Received HELLO
+2020-06-05 15:33:36 | [INFO]    | Shard 0 : Session invalidated, re-identifying...
+2020-06-05 15:33:39 | [INFO]    | Shard 0 : Received READY
+2020-06-05 15:58:18 | [INFO]    | Shard 0 : Disconnected
+2020-06-05 15:58:18 | [INFO]    | Shard 0 : Reconnecting after 914 ms...
+2020-06-05 15:58:19 | [INFO]    | Shard 0 : Connected to wss://gateway.discord.gg
+2020-06-05 15:58:19 | [INFO]    | Shard 0 : Received HELLO
+2020-06-05 15:58:20 | [INFO]    | Shard 0 : Session invalidated, re-identifying...
+2020-06-05 15:58:23 | [INFO]    | Shard 0 : Received READY
+2020-06-05 16:12:31 | [INFO]    | Discordia 2.8.3
+2020-06-05 16:12:31 | [INFO]    | Connecting to Discord...
+2020-06-05 16:12:32 | [INFO]    | Authenticated as Cosmog#7197
+2020-06-05 16:12:32 | [INFO]    | Launching shard 0 (1 out of 1)...
+2020-06-05 16:12:32 | [INFO]    | Shard 0 : Connected to wss://gateway.discord.gg
+2020-06-05 16:12:32 | [INFO]    | Shard 0 : Received HELLO
+2020-06-05 16:12:32 | [INFO]    | Shard 0 : Received READY
+2020-06-05 16:16:25 | [INFO]    | Discordia 2.8.3
+2020-06-05 16:16:25 | [INFO]    | Connecting to Discord...
+2020-06-05 16:16:25 | [INFO]    | Authenticated as Cosmog#7197
+2020-06-05 16:16:25 | [INFO]    | Launching shard 0 (1 out of 1)...
+2020-06-05 16:16:25 | [INFO]    | Shard 0 : Connected to wss://gateway.discord.gg
+2020-06-05 16:16:25 | [INFO]    | Shard 0 : Received HELLO
+2020-06-05 16:16:25 | [INFO]    | Shard 0 : Received READY
+2020-06-05 16:17:21 | [INFO]    | Discordia 2.8.3
+2020-06-05 16:17:21 | [INFO]    | Connecting to Discord...
+2020-06-05 16:17:22 | [INFO]    | Authenticated as Cosmog#7197
+2020-06-05 16:17:22 | [INFO]    | Launching shard 0 (1 out of 1)...
+2020-06-05 16:17:22 | [INFO]    | Shard 0 : Connected to wss://gateway.discord.gg
+2020-06-05 16:17:22 | [INFO]    | Shard 0 : Received HELLO
+2020-06-05 16:17:22 | [INFO]    | Shard 0 : Received READY
+2020-06-05 16:20:27 | [ERROR]   | 403 - Forbidden : DELETE https://discordapp.com/api/v7/channels/711769236183187556/messages/718574995072352290
+2020-06-05 16:22:53 | [INFO]    | Discordia 2.8.3
+2020-06-05 16:22:53 | [INFO]    | Connecting to Discord...
+2020-06-05 16:22:53 | [INFO]    | Authenticated as Cosmog#7197
+2020-06-05 16:22:53 | [INFO]    | Launching shard 0 (1 out of 1)...
+2020-06-05 16:22:53 | [INFO]    | Shard 0 : Connected to wss://gateway.discord.gg
+2020-06-05 16:22:53 | [INFO]    | Shard 0 : Received HELLO
+2020-06-05 16:22:53 | [INFO]    | Shard 0 : Received READY
+2020-06-05 16:23:02 | [ERROR]   | 403 - Forbidden : DELETE https://discordapp.com/api/v7/channels/711769236183187556/messages/718575647584419841
+2020-06-05 19:36:33 | [INFO]    | Discordia 2.8.3
+2020-06-05 19:36:33 | [INFO]    | Connecting to Discord...
+2020-06-05 19:36:33 | [INFO]    | Authenticated as Cosmog#7197
+2020-06-05 19:36:33 | [INFO]    | Launching shard 0 (1 out of 1)...
+2020-06-05 19:36:33 | [INFO]    | Shard 0 : Connected to wss://gateway.discord.gg
+2020-06-05 19:36:33 | [INFO]    | Shard 0 : Received HELLO
+2020-06-05 19:36:33 | [INFO]    | Shard 0 : Received READY
+2020-06-05 19:38:10 | [ERROR]   | 400 - Bad Request : PATCH https://discordapp.com/api/v7/guilds/711359082707157114/members/@me/nick
+2020-06-05 19:45:05 | [INFO]    | Discordia 2.8.3
+2020-06-05 19:45:05 | [INFO]    | Connecting to Discord...
+2020-06-05 19:45:05 | [INFO]    | Authenticated as Cosmog#7197
+2020-06-05 19:45:05 | [INFO]    | Launching shard 0 (1 out of 1)...
+2020-06-05 19:45:06 | [INFO]    | Shard 0 : Connected to wss://gateway.discord.gg
+2020-06-05 19:45:06 | [INFO]    | Shard 0 : Received HELLO
+2020-06-05 19:45:06 | [INFO]    | Shard 0 : Received READY

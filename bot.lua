@@ -26,8 +26,8 @@ entry = {
 	{command = 'emote', alias = 'emoji', description = 'Gets an emote as an image.', usage = 'emote [emote]'},
 	{command = 'random', type = 'message', alias = 'rand', description = 'Gets a random number between two integers.', usage = 'random [integer], [integer]'},
 	{command = 'pick', type = 'message', alias = 'choose', description = 'Picks between multiple options.', usage = 'pick [option] or [option]'},
-	{command = 'server', alias = 'guild', description = 'Gets information about the server.', usage = 'server [option]', note = 'Options include \"icon,\" \"banner,\" \"splash,\" \"owner,\" \"members,\" and \"name.\"'},
-	{command = 'poll', alias = 'vote', description = 'Creates a poll.', usage = 'poll [{question}] [{option}] [{option}]'},
+	{command = 'server', alias = 'guild', description = 'Gets information about the server.', usage = 'server (option)', note = 'Options include \"icon,\" \"banner,\" \"splash,\" \"owner,\" \"members,\" \"name,\" and \"age.\"'},
+	{command = 'poll', alias = 'vote', description = 'Creates a poll.', usage = 'poll {[question]} {[option]} {[option]}'},
 	{command = 'prefix', type = 'message', description = 'Changes the bot\'s prefix.', usage = 'prefix [option]', perms = 8},
 	{command = 'welcome', type = 'message', description = 'Configures a welcome message.', usage = 'welcome [channel] [message]', note = '\"$server$\" and \"$user$\" are replaced with the server name and the new user, respectively.', perms = 8},
 	{command = 'remind', type = 'message', alias = 'reminder', description = 'Sends a reminder.', usage = 'remind [duration] [message]', note = 'Duration is in minutes.'},
@@ -51,6 +51,11 @@ client:on('messageCreate', function(message)
 	else
 		filterList = {}
 		write(message.guild.id, 'filter', {})
+	end
+
+	--do not respond to bots
+	if message.author.bot then
+		return
 	end
 
 	--check prefix
@@ -85,7 +90,7 @@ client:on('messageCreate', function(message)
 			elseif i == 3 then
 				help(cleanContent)
 			elseif i == 5 then
-				say(message.author.bot, message.content, message)
+				say(message.content, message)
 			elseif i == 6 then
 				avatar(message.mentionedUsers.first, message.author)
 			elseif i == 7 then
@@ -99,7 +104,7 @@ client:on('messageCreate', function(message)
 			elseif i == 11 then
 				poll(message.content, message)
 			elseif i == 12 then
-				prefix(message.content, message.guild.id, message.guild:getMember(client.user.id))
+				prefix(message.content, message.guild.id, message.guild:getMember(client.user.id), message.mentionedUsers.first, message.mentionedEmojis.first, message.mentionedChannels.first)
 			elseif i == 13 then
 				welcome(message.mentionedChannels.first, message.content, message.guild.id)
 			elseif i == 14 then
@@ -171,23 +176,18 @@ function help(content)
 end
 
 function helpSummary()
-	entry[3]['content'] = {title = 'Help', fields = {}}
+	entry[3]['content'] = {title = 'Help', fields = {}, footer = {text = 'Use ' .. currentPrefix .. 'help [command] to learn more.'}}
 	for i = 1, table.maxn(entry), 1 do
 		entry[3]['content']['fields'][i] = {name = entry[i]['command'], value = entry[i]['description'], inline = false}
 	end
 end
 
-function say(bot, content, message)
-	if not bot then
-		if content:find(' ') then
-			entry[5]['content'] = content:sub(content:find(' ') + 1)
-			message:delete()
-		else
-			entry[5]['content'] = 'What should I say?'
-		end
+function say(content, message)
+	if content:find(' ') then
+		entry[5]['content'] = content:sub(content:find(' ') + 1)
+		message:delete()
 	else
-		--do not respond if a bot sent the message
-		entry[5]['content'] = ''
+		entry[5]['content'] = 'What should I say?'
 	end
 end
 
@@ -248,6 +248,7 @@ function server(content, server)
 			{option = 'owner', type = 'message', content = server.owner.user.tag .. ' owns this server.'},
 			{option = 'members', type = 'message', content = tostring(server.totalMemberCount) .. ' users are in this server.'},
 			{option = 'name', type = 'message', content = 'This server is called ' .. server.name .. '.'},
+			{option = 'age', type = 'message', content = os.date('This server was created on %b %d, %Y at %H:%M.',server.createdAt)},
 		}
 
 		for i = 1, table.maxn(tentry), 1 do
@@ -308,13 +309,21 @@ function poll(content, message)
 	end
 end
 
-function prefix(content, server, bot)
-	if content:find(' ') then
-		currentPrefix = write(server, 'prefix', content:match('%s(.+)'))
-		entry[12]['content'] = 'Changed this server\'s prefix to ' .. currentPrefix
-		nickManage(bot)
+function prefix(content, server, bot, user, emoji, channel)
+	if user then
+		entry[12]['content'] = 'You can\'t use a user mention in your prefix.'
+	elseif emoji then
+		entry[12]['content'] = 'You can\'t use an emoji in your prefix.'
+	elseif channel then
+		entry[12]['content'] = 'You can\'t use a channel mention in your prefix.'
 	else
-		entry[12]['content'] = 'What would you like this server\'s prefix to be?'
+		if content:find(' ') then
+			currentPrefix = write(server, 'prefix', content:match('%s(.+)'))
+			entry[12]['content'] = 'Changed this server\'s prefix to ' .. currentPrefix
+			nickManage(bot)
+		else
+			entry[12]['content'] = 'What would you like this server\'s prefix to be?'
+		end
 	end
 end
 
@@ -349,11 +358,11 @@ end
 function filter(server, content, channel)
 	filterList = read(server, 'filter', false)
 	entry[15]['type'] = 'message'
-	if content:find('$filter add ') then
-		filterList[table.maxn(filterList) + 1] = content:sub(content:find('$filter add ') + #'$filter add '):lower()
+	if content:find(currentPrefix .. 'filter add ') then
+		filterList[table.maxn(filterList) + 1] = content:sub(content:find(currentPrefix .. 'filter add ') + #currentPrefix + #'filter add '):lower()
 		entry[15]['content'] = 'The above word has been added to the filter list.'
-	elseif content:find('$filter remove ') then
-		local removeWord = content:sub(content:find('$filter remove ') + #'$filter remove '):lower()
+	elseif content:find(currentPrefix .. 'filter remove ') then
+		local removeWord = content:sub(content:find(currentPrefix .. 'filter remove ') + #currentPrefix + #'filter remove '):lower()
 		for i = 1, table.maxn(filterList), 1 do
 			if removeWord == filterList[i] then
 				table.remove(filterList, i)
@@ -362,13 +371,13 @@ function filter(server, content, channel)
 				entry[15]['content'] = 'It appears that \"' .. removeWord .. '\" is not on the filter list.'
 			end
 		end
-	elseif content:find('$filter list') then
+	elseif content:find(currentPrefix .. 'filter list') then
 		entry[15]['content'] = {title = 'Filtered Words', description = ''}
 		entry[15]['type'] = 'embed'
 		for i = 1, table.maxn(filterList), 1 do
 			entry[15]['content']['description'] = entry[15]['content']['description'] .. '\n' .. filterList[i]
 		end
-	elseif content:find('$filter clear') then
+	elseif content:find(currentPrefix .. 'filter clear') then
 		filterList = {}
 		entry[15]['content'] = 'The filter list has been cleared.'
 	else
