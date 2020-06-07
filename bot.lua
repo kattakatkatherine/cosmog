@@ -1,5 +1,6 @@
 local discordia = require('discordia')
-local json = require ('json')
+local json = require('json')
+local base64 = require('base64')
 local client = discordia.Client()
 
 --[[
@@ -12,31 +13,43 @@ local client = discordia.Client()
 ]]
 
 client:on('ready', function()
-	print('Logged in as Cosmog')
-	client:setGame("$help")
+
+	--configure
+	local file = io.open('config.json', 'r')
+	local decoded = json.decode(file:read('*a'))
+	botName = decoded['Name']
+	botAvatar = decoded['Avatar']
+	botStatus = decoded['Status']
+	botPrefix = decoded['Prefix']
+	file:close()
+
+	print('Logged in as ' .. botName)
+	client:setUsername(botName)
+	client:setGame(botStatus)
+	client:setAvatar(botAvatar)
+
+	entry = {
+		{command = 'ping', content = 'Pong!', type = 'message', alias = 'pong', description = 'Checks to see if ' .. botName .. ' is online.', usage = 'ping'},
+		{command = 'info', type = 'embed', description = 'Gets ' .. botName .. '\'s information.', usage = 'info'},
+		{command = 'help', type = 'embed', description = 'Gets a list of commands.', usage = 'help (command)'},
+		{command = 'invite', content = 'https://discord.com/api/oauth2/authorize?client_id=711547275410800701&permissions=8&scope=bot', type = 'message', description = 'Grabs ' .. botName .. '\'s invite link.', usage = 'invite'},
+		{command = 'say', type = 'message', alias = 'echo', description = 'Says something.', usage = 'say [text]'},
+		{command = 'avatar', type = 'embed', alias = 'pfp', description = 'Gets a user\'s profile picture.', usage = 'avatar (mention)'},
+		{command = 'emote', alias = 'emoji', description = 'Gets an emote as an image.', usage = 'emote [emote]'},
+		{command = 'random', type = 'message', alias = 'rand', description = 'Gets a random number between two integers.', usage = 'random [integer], [integer]'},
+		{command = 'pick', type = 'message', alias = 'choose', description = 'Picks between multiple options.', usage = 'pick [option] or [option]'},
+		{command = 'server', alias = 'guild', description = 'Gets information about the server.', usage = 'server (option)', note = 'Options include \"icon,\" \"banner,\" \"splash,\" \"owner,\" \"members,\" \"name,\" and \"age.\"'},
+		{command = 'poll', alias = 'vote', description = 'Creates a poll.', usage = 'poll {[question]} {[option]} {[option]}'},
+		{command = 'prefix', type = 'message', description = 'Changes the bot\'s prefix.', usage = 'prefix [option]', perms = 8},
+		{command = 'welcome', type = 'message', description = 'Configures a welcome message.', usage = 'welcome [channel] [message]', note = '\"$server$\" and \"$user$\" are replaced with the server name and the new user, respectively.', perms = 8},
+		{command = 'remind', type = 'message', alias = 'reminder', description = 'Sends a reminder.', usage = 'remind [duration] [message]', note = 'Duration is in minutes.'},
+		{command = 'filter', description = 'Manages the list of filtered words.', usage = 'filter [option] (word)', note = 'Options include \"add,\" \"remove,\" \"list,\" and \"clear.\"', perms = 8},
+		{command = 'coin', type = 'message', alias = 'flip', description = 'Flips a coin.', usage = 'coin'},
+		{command = 'dice', type = 'message', alias = 'roll', description = 'Rolls dice.', usage = 'dice ((number of dice)[d][number of faces])', note =  'The default roll is 1d6.'},
+		[0] = {} --left blank
+	}
+
 end)
-
-entry = {
-	{command = 'ping', content = 'Pong!', type = 'message', alias = 'pong', description = 'Checks to see if Cosmog is online.', usage = 'ping'},
-	{command = 'info', type = 'embed', description = 'Gets Cosmog\'s information.', usage = 'info'},
-	{command = 'help', type = 'embed', description = 'Gets a list of commands.', usage = 'help (command)'},
-	{command = 'invite', content = 'https://discord.com/api/oauth2/authorize?client_id=711547275410800701&permissions=8&scope=bot', type = 'message', description = 'Grabs Cosmog\'s invite link.', usage = 'invite'},
-	{command = 'say', type = 'message', alias = 'echo', description = 'Says something.', usage = 'say [text]'},
-	{command = 'avatar', type = 'embed', alias = 'pfp', description = 'Gets a user\'s profile picture.', usage = 'avatar (mention)'},
-	{command = 'emote', alias = 'emoji', description = 'Gets an emote as an image.', usage = 'emote [emote]'},
-	{command = 'random', type = 'message', alias = 'rand', description = 'Gets a random number between two integers.', usage = 'random [integer], [integer]'},
-	{command = 'pick', type = 'message', alias = 'choose', description = 'Picks between multiple options.', usage = 'pick [option] or [option]'},
-	{command = 'server', alias = 'guild', description = 'Gets information about the server.', usage = 'server (option)', note = 'Options include \"icon,\" \"banner,\" \"splash,\" \"owner,\" \"members,\" \"name,\" and \"age.\"'},
-	{command = 'poll', alias = 'vote', description = 'Creates a poll.', usage = 'poll {[question]} {[option]} {[option]}'},
-	{command = 'prefix', type = 'message', description = 'Changes the bot\'s prefix.', usage = 'prefix [option]', perms = 8},
-	{command = 'welcome', type = 'message', description = 'Configures a welcome message.', usage = 'welcome [channel] [message]', note = '\"$server$\" and \"$user$\" are replaced with the server name and the new user, respectively.', perms = 8},
-	{command = 'remind', type = 'message', alias = 'reminder', description = 'Sends a reminder.', usage = 'remind [duration] [message]', note = 'Duration is in minutes.'},
-	{command = 'filter', description = 'Manages the list of filtered words.', usage = 'filter [option] (word)', note = 'Options include \"add,\" \"remove,\" \"list,\" and \"clear.\"', perms = 8},
-	{command = 'coin', type = 'message', alias = 'flip', description = 'Flips a coin.', usage = 'coin'},
-	{command = 'dice', type = 'message', alias = 'roll', description = 'Rolls dice.', usage = 'dice ((number of dice)[d][number of faces])', note =  'The default roll is 1d6.'},
-	[0] = {} --left blank
-}
-
 
 client:on('messageCreate', function(message)
 
@@ -63,7 +76,7 @@ client:on('messageCreate', function(message)
 	end
 
 	--check prefix
-	currentPrefix = read(message.guild.id, 'prefix', '$')
+	currentPrefix = read(message.guild.id, 'prefix', botPrefix)
 
 	--determine command
 	for i = 1, table.maxn(entry), 1 do
@@ -147,7 +160,7 @@ end)
 
 function info(servers, pfp)
 	entry[2]['content'] = {
-		title = 'Cosmog',
+		title = botName:gsub('^%l', string.upper),
 		thumbnail = {url = pfp},
 		description = 'A general-purpose bot with a variety of useful commands.\nCurrently in ' .. servers .. ' servers.',
 		footer = {text = 'Created by kat#8931 <3'}
@@ -436,7 +449,7 @@ end
 
 --writes to config file
 function write(server, option, content)
-	local file = io.open('config.json', 'r')
+	local file = io.open('servers.json', 'r')
 	local search = file:read('*a')
 	file:close()
 	local decoded = json.decode(search)
@@ -447,7 +460,7 @@ function write(server, option, content)
 
 	decoded[server][option] = content
 	local encoded = json.encode(decoded)
-	local file = io.open('config.json', 'w+')
+	local file = io.open('servers.json', 'w+')
 	file:write(encoded)
 	file:close()
 	return content
@@ -455,7 +468,7 @@ end
 
 --reads from config file
 function read(server, option, default)
-	local file = io.open('config.json', 'r')
+	local file = io.open('servers.json', 'r')
 	local decoded = json.decode(file:read('*a'))
 	local variable = default
 
@@ -471,7 +484,7 @@ end
 function nickManage(bot)
 	local nickname = nil
 	if currentPrefix ~= '$' then
-		nickname = 'Cosmog [' .. currentPrefix .. ']'
+		nickname = botName .. ' [' .. currentPrefix .. ']'
 	end
 	bot:setNickname(nickname)
 end
@@ -485,5 +498,5 @@ function pollReact(message, sentID)
 	end
 end
 
---token stored in outside file
-client:run('Bot ' .. io.open('../token.txt'):read())
+--run
+client:run('Bot ' .. json.decode(io.open('config.json', 'r'):read('*a'))['Token'])
