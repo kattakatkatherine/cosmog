@@ -8,25 +8,23 @@ local client = discordia.Client()
 	by Katherine Gearhart
 	Summer 2020
 
-	Created with Discordia
+	Made with Discordia
 	https://github.com/SinisterRectus/Discordia/wiki
 ]]
 
 client:on('ready', function()
 
-	--configure
+	--configure bot
 	local file = io.open('config.json', 'r')
 	local decoded = json.decode(file:read('*a'))
 	botName = decoded['Name']
-	botAvatar = decoded['Avatar']
-	botStatus = decoded['Status']
+	client:setUsername(botName)
+	client:setAvatar(decoded['Avatar'])
+	client:setGame(decoded['Status'])
 	botPrefix = decoded['Prefix']
 	file:close()
 
 	print('Logged in as ' .. botName)
-	client:setUsername(botName)
-	client:setGame(botStatus)
-	client:setAvatar(botAvatar)
 
 	entry = {
 		{command = 'ping', content = 'Pong!', type = 'message', alias = 'pong', description = 'Checks to see if ' .. botName .. ' is online.', usage = 'ping'},
@@ -40,9 +38,9 @@ client:on('ready', function()
 		{command = 'pick', type = 'message', alias = 'choose', description = 'Picks between multiple options.', usage = 'pick [option] or [option]'},
 		{command = 'server', alias = 'guild', description = 'Gets information about the server.', usage = 'server (option)', note = 'Options include \"icon,\" \"banner,\" \"splash,\" \"owner,\" \"members,\" \"name,\" and \"age.\"'},
 		{command = 'poll', alias = 'vote', description = 'Creates a poll.', usage = 'poll {[question]} {[option]} {[option]}'},
-		{command = 'prefix', type = 'message', description = 'Changes the bot\'s prefix.', usage = 'prefix [option]', perms = 8},
+		{command = 'prefix', type = 'message', description = 'Changes ' .. botName .. '\'s prefix.', usage = 'prefix [option]', perms = 8},
 		{command = 'welcome', type = 'message', description = 'Configures a welcome message.', usage = 'welcome [channel] [message]', note = '\"$server$\" and \"$user$\" are replaced with the server name and the new user, respectively.', perms = 8},
-		{command = 'remind', type = 'message', alias = 'reminder', description = 'Sends a reminder.', usage = 'remind [duration] [message]', note = 'Duration is in minutes.'},
+		{command = 'remind', type = 'message', alias = 'reminder', description = 'Sets a reminder.', usage = 'remind [duration] [message]', note = 'Duration is in minutes.'},
 		{command = 'filter', description = 'Manages the list of filtered words.', usage = 'filter [option] (word)', note = 'Options include \"add,\" \"remove,\" \"list,\" and \"clear.\"', perms = 8},
 		{command = 'coin', type = 'message', alias = 'flip', description = 'Flips a coin.', usage = 'coin'},
 		{command = 'dice', type = 'message', alias = 'roll', description = 'Rolls dice.', usage = 'dice ((number of dice)[d][number of faces])', note =  'The default roll is 1d6.'},
@@ -303,7 +301,6 @@ end
 function poll(content, message)
 	entry[11]['code'] = 0
 	entry[11]['type'] = 'message'
-	entry[11]['content'] = 'Please surround the question with curly brackets.'
 	if content and content:find('{.*}') then
 		local question = content:match('{(.-)}')
 		content = content:match('}(.*)$')
@@ -321,6 +318,8 @@ function poll(content, message)
 		message:delete()
 		entry[11]['type'] = 'embed'
 		entry[11]['content'] = {title = question, description = options}
+	else
+		entry[11]['content'] = 'Please surround the question with curly brackets.'
 	end
 end
 
@@ -331,14 +330,12 @@ function prefix(content, server, bot, user, emoji, channel)
 		entry[12]['content'] = 'You can\'t use an emoji in your prefix.'
 	elseif channel then
 		entry[12]['content'] = 'You can\'t use a channel mention in your prefix.'
+	elseif content then
+		currentPrefix = write(server, 'prefix', content)
+		entry[12]['content'] = 'Changed this server\'s prefix to ' .. currentPrefix
+		nickManage(bot)
 	else
-		if content then
-			currentPrefix = write(server, 'prefix', content)
-			entry[12]['content'] = 'Changed this server\'s prefix to ' .. currentPrefix
-			nickManage(bot)
-		else
-			entry[12]['content'] = 'What would you like this server\'s prefix to be?'
-		end
+		entry[12]['content'] = 'What would you like this server\'s prefix to be?'
 	end
 end
 
@@ -483,7 +480,7 @@ end
 --$prefix changes bot's nickname
 function nickManage(bot)
 	local nickname = nil
-	if currentPrefix ~= '$' then
+	if currentPrefix ~= botPrefix then
 		nickname = botName .. ' [' .. currentPrefix .. ']'
 	end
 	bot:setNickname(nickname)
