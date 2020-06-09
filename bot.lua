@@ -1,6 +1,5 @@
 local discordia = require('discordia')
 local json = require('json')
-local base64 = require('base64')
 local client = discordia.Client()
 
 --[[
@@ -40,7 +39,7 @@ client:on('ready', function()
 		{command = 'poll', alias = 'vote', description = 'Creates a poll.', usage = 'poll {[question]} {[option]} {[option]}'},
 		{command = 'prefix', type = 'message', description = 'Changes ' .. botName .. '\'s prefix.', usage = 'prefix [option]', perms = 8},
 		{command = 'welcome', type = 'message', description = 'Configures a welcome message.', usage = 'welcome [channel] [message]', note = '\"$server$\" and \"$user$\" are replaced with the server name and the new user, respectively.', perms = 8},
-		{command = 'remind', type = 'message', alias = 'reminder', description = 'Sets a reminder.', usage = 'remind [duration] [message]', note = 'Duration is in minutes.'},
+		{command = 'remind', type = 'message', alias = 'reminder', description = 'Sets a reminder.', usage = 'remind [duration][h/m/s] (message)'},
 		{command = 'filter', description = 'Manages the list of filtered words.', usage = 'filter [option] (word)', note = 'Options include \"add,\" \"remove,\" \"list,\" and \"clear.\"', perms = 8},
 		{command = 'coin', type = 'message', alias = 'flip', description = 'Flips a coin.', usage = 'coin'},
 		{command = 'dice', type = 'message', alias = 'roll', description = 'Rolls dice.', usage = 'dice ((number of dice)[d][number of faces])', note =  'The default roll is 1d6.'},
@@ -79,9 +78,6 @@ client:on('messageCreate', function(message)
 	--determine command
 	for i = 1, table.maxn(entry), 1 do
 		if message.content:sub(1, #currentPrefix + #entry[i]['command']) == currentPrefix .. entry[i]['command'] or entry[i]['alias'] and message.content:sub(1, #currentPrefix + #entry[i]['alias']) == currentPrefix .. entry[i]['alias'] then
-
-			--print command used
-			print(entry[i]['command'])
 
 			--check permissions
 			if entry[i]['perms'] then
@@ -308,7 +304,7 @@ function poll(content, message)
 		local options = ''
 		emotes = {'🇦','🇧','🇨','🇩','🇪','🇫','🇬','🇭','🇮','🇯','🇰','🇱','🇲','🇳','🇴','🇵','🇶','🇷','🇸','🇹'}
 
-		while content:match('{.*}') and i <= 20 do
+		while content:find('{.*}') and i <= 20 do
 			i = i + 1
 			options = options .. '\n\n'..emotes[i] .. ' ' .. content:match('{(.-)}')
 			content = content:match('}(.*)$')
@@ -357,13 +353,25 @@ function welcome(channel, content, server)
 end
 
 function remind(content, mention, message)
-	if content and content:find('%d') then
+	if content and content:find('%d+%.?%d*[hms]') then
 		local timer = require('timer')
 		entry[14]['content'] = 'Your reminder has been set!'
 		output(14, message.channel, message, message.guild:getMember(client.user.id))
-		--wait before sending reminder
-		timer.sleep(content:match('%d+%.?%d*') * 60000)
-		entry[14]['content'] = '**Reminder** ' .. mention .. content:match('%d+%.?%d*(.*)')
+
+		local duration = {'h', 'm', 's'}
+		for i = 1, 3, 1 do
+			duration[i] = content:match('(%d+%.?%d*)[' .. duration[i] .. ']')
+			if not duration[i] then
+				duration[i] = 0
+			end
+		end
+		local text = content:match('^(.-)%s*%d+%.?%d*[hms]') .. content:match('%d+%.?%d*[hms]%s*(.-)$')
+		if not text then
+			text = ''
+		end
+
+		timer.sleep(duration[1] * 3600000 + duration[2] * 60000 + duration[3] * 1000)
+		entry[14]['content'] = '**Reminder** ' .. mention .. ' '.. text
 	else
 		entry[14]['content'] = 'When would you like me to remind you?'
 	end
