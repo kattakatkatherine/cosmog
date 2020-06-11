@@ -7,23 +7,23 @@ Summer 2020.
 ## Features
 Command | Function
 ------- | --------
-ping | Checks to see if Cosmog is online.
-info | Gets Cosmog's information.
-help | Gets a list of commands.
-invite | Grabs Cosmog's invite link.
-say | Says something.
 avatar | Gets a user's profile picture.
-emote | Gets an emote as an image.
-random | Gets a random number between two integers.
-pick | Picks between multiple options.
-server | Gets information about the server.
-poll | Creates a poll.
-prefix | Changes Cosmog's prefix.
-welcome | Configures a welcome message.
-remind | Sets a reminder.
-filter | Manages the list of filtered words.
 coin | Flips a coin.
 dice | Rolls dice.
+emote | Gets an emote as an image.
+filter | Manages the list of filtered words.
+help | Gets a list of commands.
+info | Gets Cosmog's information.
+invite | Grabs Cosmog's invite link.
+pick | Picks between multiple options.
+ping | Checks to see if Cosmog is online.
+poll | Creates a poll.
+prefix | Changes Cosmog's prefix.
+random | Gets a random number between two integers.
+remind | Sets a reminder.
+say | Says something.
+server | Gets information about the server.
+welcome | Configures a welcome message.
 
 ## Hosting
 1. Install [Luvit](https://luvit.io/install.html).
