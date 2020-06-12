@@ -2,6 +2,7 @@
   "Token" : "",
   "Name" : "Cosmog",
   "Avatar" : "avatar.png",
+  "Color" : "#206694",
   "Status" : "$help",
   "Prefix" : "$"
 }
