@@ -7,7 +7,6 @@ Summer 2020.
 ## Features
 Command | Function
 ------- | --------
-avatar | Gets a user's profile picture.
 coin | Flips a coin.
 dice | Rolls dice.
 emote | Gets an emote as an image.
@@ -23,6 +22,7 @@ random | Gets a random number between two integers.
 remind | Sets a reminder.
 say | Says something.
 server | Gets information about the server.
+user | Gets information about a user.
 welcome | Configures a welcome message.
 
 ## Hosting
