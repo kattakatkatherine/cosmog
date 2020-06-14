@@ -18,6 +18,7 @@ pick | Picks between multiple options.
 ping | Checks to see if Cosmog is online.
 poll | Creates a poll.
 prefix | Changes Cosmog's prefix.
+purge | Bulk deletes messages.
 random | Gets a random number between two integers.
 remind | Sets a reminder.
 say | Says something.

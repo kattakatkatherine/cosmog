@@ -36,9 +36,10 @@ client:on('ready', function()
 		prefix = {type = 'message', description = 'Changes ' .. botName .. '\'s prefix.', usage = 'prefix [option]', perms = 8, ftn = prefix},
 		welcome = {description = 'Configures a welcome message.', usage = 'welcome [option] (arguments)', note = 'Options include \"set,\" \"current,\" and \"clear.\" \"$server$\" and \"$user$\" are replaced with the server name and the new user, respectively.', perms = 8, ftn = welcome},
 		remind = {type = 'message', alias = 'reminder', description = 'Sets a reminder.', usage = 'remind [duration][h/m/s] (message)', ftn = remind},
-		filter = {description = 'Manages the list of filtered words.', usage = 'filter [option] (word)', note = 'Options include \"add,\" \"remove,\" \"list,\" and \"clear.\"', perms = 8, ftn = filter},
+		filter = {description = 'Manages the list of filtered words.', usage = 'filter [option] (word)', note = 'Options include \"add,\" \"remove,\" \"list,\" and \"clear.\"', perms = 8192, ftn = filter},
 		coin = {type = 'message', alias = 'flip', description = 'Flips a coin.', usage = 'coin', ftn = coin},
 		dice = {type = 'message', alias = 'roll', description = 'Rolls dice.', usage = 'dice ((number of dice)[d][number of faces])', note =  'The default roll is 1d6.', ftn = dice},
+	  purge = {type = 'message', alias = 'bulk', description = 'Bulk deletes messages.', usage = 'purge [number of messages]', note = 'This command cannot delete messages older than two weeks.', perms = 8192, ftn = purge}
 	}
 
 	-- alphabetize
@@ -58,6 +59,11 @@ client:on('ready', function()
 end)
 
 client:on('messageCreate', function(message)
+
+	-- respond only if in a server
+	if not message.guild then
+		return
+	end
 
 	-- delete words with filtered terms
 	filterList = read(message.guild.id, 'filter')
@@ -145,13 +151,13 @@ function help(_, _, content)
 	for key, val in pairs(entry) do
 		if content:find('^' .. key) or val.alias and content:find('^' .. val.alias) then
 			ttitle = key:gsub('^%l', string.upper)
-			table.insert(tfields, {name = 'Description', value = val.description, inline = false})
-			table.insert(tfields, {name = 'Usage', value = currentPrefix .. val.usage, inline = false})
+			table.insert(tfields, {name = 'Description', value = val.description})
+			table.insert(tfields, {name = 'Usage', value = currentPrefix .. val.usage})
 			if val.note then
-				table.insert(tfields, {name = 'Note', value = val.note, inline = false})
+				table.insert(tfields, {name = 'Note', value = val.note})
 			end
 			if val.alias then
-				table.insert(tfields, {name = 'Alias', value = val.alias, inline = false})
+				table.insert(tfields, {name = 'Alias', value = val.alias})
 			end
 			entry.help.content = {title = ttitle, fields = tfields}
 			return
@@ -159,7 +165,7 @@ function help(_, _, content)
 	end
 	entry.help.content = {title = 'Help', fields = {}, footer = {text = 'Use ' .. currentPrefix .. 'help [command] to learn more.'}}
 	for key, val in ipairs(entryOrdered) do
-		entry.help.content.fields[key] = {name = val.command, value = val.description, inline = false}
+		entry.help.content.fields[key] = {name = val.command, value = val.description}
 	end
 end
 
@@ -203,7 +209,7 @@ function user(_, message, content)
 end
 
 function emote(content, message)
-  emote = message.mentionedEmojis.first
+  local emote = message.mentionedEmojis.first
 	if emote then
 		entry.emote.type = 'embed'
 		entry.emote.content = {image = {url = emote.url}}
@@ -275,14 +281,13 @@ function poll(content, message)
 	entry.poll.type = 'message'
 	if content:find('{.*}') then
 		local question = content:match('{(.-)}')
-		content = content:match('}(.*)$')
 		local options = ''
 		emotes = {'🇦','🇧','🇨','🇩','🇪','🇫','🇬','🇭','🇮','🇯','🇰','🇱','🇲','🇳','🇴','🇵','🇶','🇷','🇸','🇹'}
 
-		while content:find('{.*}') and entry.poll.code <= 20 do
+		while content:find('}{.*}') and entry.poll.code <= 20 do
+		  content = content:match('}(.*)$')
 			entry.poll.code = entry.poll.code + 1
 			options = options .. '\n\n'..emotes[entry.poll.code] .. ' ' .. content:match('{(.-)}')
-			content = content:match('}(.*)$')
 		end
 
 		message:delete()
@@ -295,11 +300,11 @@ end
 
 function prefix(content, message)
 	if message.mentionedUsers.first then
-		entry.prefix.content = 'You can\'t use a user mention in your prefix.'
+		entry.prefix.content = 'You can\'t mention a user in your prefix.'
 	elseif message.mentionedEmojis.first then
 		entry.prefix.content = 'You can\'t use an emoji in your prefix.'
 	elseif message.mentionedChannels.first then
-		entry.prefix.content = 'You can\'t use a channel mention in your prefix.'
+		entry.prefix.content = 'You can\'t mention a channel in your prefix.'
 	elseif content ~= '' then
 		currentPrefix = write(message.guild.id, 'prefix', content)
 		entry.prefix.content = 'Changed this server\'s prefix to ' .. currentPrefix
@@ -317,23 +322,17 @@ function welcome(content, message)
 	entry.welcome.type = 'message'
   if content:lower():find('^set') then
     if channel then
-      local welcomeSegment1, welcomeSegment2 = content:match('^set%s*(.-)%s*' .. channel.mentionString .. '%s*(.*)$')
-  		if not welcomeSegment1 then
-  		  welcomeSegment1 = ''
-  		end
-  		if not welcomeSegment2 then
-  		  welcomeSegment2 = ''
-  		end
-  		if welcomeSegment1 .. #welcomeSegment2 == '' then
-  			entry.welcome.content = 'What message would you like me to send?'
-  		else
-  			welcomeChannel = channel.id
-  			welcomeMessage = welcomeSegment1 .. welcomeSegment2
+      welcomeMessage = content:match('^set%s*(.-)%s*' .. channel.mentionString) .. content:match(channel.mentionString .. '%s*(.*)$')
+      if not welcomeMessage or welcomeMessage == '' then
+        entry.welcome.content = 'What message would you like me to send?'
+        return
+      else
+        welcomeChannel = channel.id
   			entry.welcome.content = 'The welcome message has been set.'
-  		end
+      end
   	else
   	  entry.welcome.content = 'What channel would you like me to send the message in?'
-  end
+    end
   elseif content:lower():find('^clear') then
     welcomeChannel = nil
     welcomeMessage = nil
@@ -343,8 +342,8 @@ function welcome(content, message)
     entry.welcome.content = {
       title = 'Welcome',
       fields = {
-        {name = 'Message', value = welcomeMessage, inline = false},
-        {name = 'Channel', value = '#' .. client:getChannel(welcomeChannel).name, inline = false}
+        {name = 'Message', value = welcomeMessage},
+        {name = 'Channel', value = '#' .. client:getChannel(welcomeChannel).name}
       }
     }
 	else
@@ -424,7 +423,7 @@ end
 
 function coin()
 	local result = 'heads ' .. client:getEmoji('717821936163356723').mentionString
-	if math.random(0, 1) == 0 then
+	if math.random(2) == 1 then
 		result = 'tails ' .. client:getEmoji('717821935924543560').mentionString
 	end
 	entry.coin.content = 'You got... ' .. result
@@ -439,13 +438,27 @@ function dice(_, _, content)
 			content = content:match('%d+.*')
 			diceCount = content:match('%d+')
 		end
-		content = content:sub(content:find('d') + 1)
+		content = content:match('d(.*)$')
 		diceType = content:match('%d+')
 	end
 	for i = 1, diceCount, 1 do
 		sum = sum + math.random(diceType)
 	end
 	entry.dice.content = 'You got... ' .. sum .. ' 🎲'
+end
+
+function purge(content, message)
+  local purgeCount = tonumber(content:match('%d+'))
+  if purgeCount then
+    while purgeCount > 100 do
+      message.channel:bulkDelete(message.channel:getMessages(100))
+      purgeCount = purgeCount - 100
+    end
+    message.channel:bulkDelete(message.channel:getMessages(purgeCount))
+    entry.purge.content = purgeCount .. ' messages have been deleted.'
+  else
+    entry.purge.content = 'How many messages should I delete?'
+  end
 end
 
 -- send the message
@@ -493,7 +506,7 @@ function read(server, option, default)
 	return variable
 end
 
---iterate through an options table
+-- iterate through an options table
 function optionSet(val)
   if val.content then
 		if val.type == 'image' then
