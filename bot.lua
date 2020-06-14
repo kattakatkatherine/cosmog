@@ -23,22 +23,22 @@ client:on('ready', function()
 
 	entry = {
 		ping = {content = 'Pong!', type = 'message', alias = 'pong', description = 'Checks to see if ' .. botName .. ' is online.', usage = 'ping'},
-		info = {type = 'embed', description = 'Gets ' .. botName .. '\'s information.', usage = 'info'},
-		help = {type = 'embed', description = 'Gets a list of commands.', usage = 'help (command)'},
+		info = {type = 'embed', description = 'Gets ' .. botName .. '\'s information.', usage = 'info', ftn = info},
+		help = {type = 'embed', description = 'Gets a list of commands.', usage = 'help (command)', ftn = help},
 		invite = {content = 'https://discord.com/api/oauth2/authorize?client_id=711547275410800701&permissions=8&scope=bot', type = 'message', description = 'Grabs ' .. botName .. '\'s invite link.', usage = 'invite'},
-		say = {type = 'message', alias = 'echo', description = 'Says something.', usage = 'say [text]'},
-		user = {type = 'embed', description = 'Gets information about a user.', usage = 'user (mention) (option)', note = 'Options include \"avatar,\" \"join,\" and \"age.\"'},
-		emote = {alias = 'emoji', description = 'Gets an emote as an image.', usage = 'emote [emote]'},
-		random = {type = 'message', alias = 'rand', description = 'Gets a random number between two integers.', usage = 'random [integer], [integer]'},
-		pick = {type = 'message', alias = 'choose', description = 'Picks between multiple options.', usage = 'pick [option] or [option] . . .'},
-		server = {alias = 'guild', description = 'Gets information about the server.', usage = 'server (option)', note = 'Options include \"icon,\" \"banner,\" \"splash,\" \"owner,\" \"members,\" \"name,\" and \"age.\"'},
-		poll = {alias = 'vote', description = 'Creates a poll.', usage = 'poll {[question]} {[option]} {[option]} . . .'},
-		prefix = {type = 'message', description = 'Changes ' .. botName .. '\'s prefix.', usage = 'prefix [option]', perms = 8},
-		welcome = {description = 'Configures a welcome message.', usage = 'welcome [option] (arguments)', note = 'Options include \"set,\" \"current,\" and \"clear.\" \"$server$\" and \"$user$\" are replaced with the server name and the new user, respectively.', perms = 8},
-		remind = {type = 'message', alias = 'reminder', description = 'Sets a reminder.', usage = 'remind [duration][h/m/s] (message)'},
-		filter = {description = 'Manages the list of filtered words.', usage = 'filter [option] (word)', note = 'Options include \"add,\" \"remove,\" \"list,\" and \"clear.\"', perms = 8},
-		coin = {type = 'message', alias = 'flip', description = 'Flips a coin.', usage = 'coin'},
-		dice = {type = 'message', alias = 'roll', description = 'Rolls dice.', usage = 'dice ((number of dice)[d][number of faces])', note =  'The default roll is 1d6.'},
+		say = {type = 'message', alias = 'echo', description = 'Says something.', usage = 'say [text]', ftn = say},
+		user = {type = 'embed', description = 'Gets information about a user.', usage = 'user (mention) (option)', note = 'Options include \"avatar,\" \"join,\" and \"age.\"', ftn = user},
+		emote = {alias = 'emoji', description = 'Gets an emote as an image.', usage = 'emote [emote]', ftn = emote},
+		random = {type = 'message', alias = 'rand', description = 'Gets a random number between two integers.', usage = 'random [integer], [integer]', ftn = random},
+		pick = {type = 'message', alias = 'choose', description = 'Picks between multiple options.', usage = 'pick [option] or [option] . . .', ftn = pick},
+		server = {alias = 'guild', description = 'Gets information about the server.', usage = 'server (option)', note = 'Options include \"icon,\" \"banner,\" \"splash,\" \"owner,\" \"members,\" \"name,\" and \"age.\"', ftn = server},
+		poll = {alias = 'vote', description = 'Creates a poll.', usage = 'poll {[question]} {[option]} {[option]} . . .', ftn = poll},
+		prefix = {type = 'message', description = 'Changes ' .. botName .. '\'s prefix.', usage = 'prefix [option]', perms = 8, ftn = prefix},
+		welcome = {description = 'Configures a welcome message.', usage = 'welcome [option] (arguments)', note = 'Options include \"set,\" \"current,\" and \"clear.\" \"$server$\" and \"$user$\" are replaced with the server name and the new user, respectively.', perms = 8, ftn = welcome},
+		remind = {type = 'message', alias = 'reminder', description = 'Sets a reminder.', usage = 'remind [duration][h/m/s] (message)', ftn = remind},
+		filter = {description = 'Manages the list of filtered words.', usage = 'filter [option] (word)', note = 'Options include \"add,\" \"remove,\" \"list,\" and \"clear.\"', perms = 8, ftn = filter},
+		coin = {type = 'message', alias = 'flip', description = 'Flips a coin.', usage = 'coin', ftn = coin},
+		dice = {type = 'message', alias = 'roll', description = 'Rolls dice.', usage = 'dice ((number of dice)[d][number of faces])', note =  'The default roll is 1d6.', ftn = dice},
 	}
 
 	-- alphabetize
@@ -60,11 +60,12 @@ end)
 client:on('messageCreate', function(message)
 
 	-- delete words with filtered terms
-	filterList = read(message.guild.id, 'filter', false)
+	filterList = read(message.guild.id, 'filter')
 	if filterList then
 		for _, val in pairs(filterList) do
 			if message.content:lower():find(val) and not message.member:hasPermission(8) then
 				message:delete()
+				return
 			end
 		end
 	else
@@ -85,13 +86,11 @@ client:on('messageCreate', function(message)
 		if message.content:find('^' .. currentPrefix .. key) or val.alias and message.content:find('^' .. currentPrefix .. val.alias) then
 
 			-- check permissions
-			if val.perms then
-				if not message.member:hasPermission(val.perms) then
-					val.type = 'message'
-					val.content = 'You do not have the necessary permissions to use this command.'
-					output(key, message.channel, message)
-					return
-				end
+			if val.perms and not message.member:hasPermission(val.perms) then
+				val.type = 'message'
+				val.content = 'You do not have the necessary permissions to use this command.'
+				output(key, message.channel, message)
+				return
 			end
 
 			-- generate random numbers
@@ -99,46 +98,14 @@ client:on('messageCreate', function(message)
 			math.random(); math.random(); math.random()
 
 			-- format message content
-			cleanContent = message.content:gsub('  ', ' ')
-			while cleanContent:find('  ') do
-				cleanContent = cleanContent:gsub('  ', ' ')
-			end
-			cleanContent = cleanContent:match(key .. '%s*(.*)$')
+			cleanContent = message.content:gsub('%s+', ' '):match(key .. '%s*(.*)$')
 			if not cleanContent then
 			  cleanContent = ''
 			end
 
 			-- dynamic commands
-			if key == 'info' then
-				info(tostring(#client.guilds), client:getUser(client.user.id):getAvatarURL() .. '?size=1024')
-			elseif key == 'help' then
-				help(cleanContent:lower())
-			elseif key == 'say' then
-				say(cleanContent, message)
-			elseif key == 'user' then
-				user(cleanContent:lower(), message.mentionedUsers.first, message.author)
-			elseif key == 'emote' then
-				emote(message.mentionedEmojis.first, cleanContent)
-			elseif key == 'random' then
-				random(cleanContent)
-			elseif key == 'pick' then
-				pick(cleanContent)
-			elseif key == 'server' then
-				server(cleanContent:lower(), message.guild)
-			elseif key == 'poll' then
-				poll(cleanContent, message)
-			elseif key == 'prefix' then
-				prefix(cleanContent, message.guild.id, message.guild:getMember(client.user.id), message.mentionedUsers.first, message.mentionedEmojis.first, message.mentionedChannels.first)
-			elseif key == 'welcome' then
-				welcome(message.mentionedChannels.first, cleanContent, message.guild.id)
-			elseif key == 'remind' then
-				remind(cleanContent, message.author.mentionString, message)
-			elseif key == 'filter' then
-				filter(message.guild.id, cleanContent:lower())
-			elseif key == 'coin' then
-				coin()
-			elseif key == 'dice' then
-				dice(cleanContent)
+			if val.ftn then
+			  val.ftn(cleanContent, message, cleanContent:lower())
 			end
 
 			-- send message
@@ -150,12 +117,12 @@ end)
 
 -- send welcome message
 client:on('memberJoin', function(member)
-	welcomeChannel = read(member.guild.id, 'welcomeChannel', nil)
-	welcomeMessage = read(member.guild.id, 'welcomeMessage', nil)
+	welcomeChannel = read(member.guild.id, 'welcomeChannel')
+	welcomeMessage = read(member.guild.id, 'welcomeMessage')
 	if welcomeChannel and welcomeMessage then
 		entry.blank.type = 'message'
 		entry.blank.content = welcomeMessage:gsub('%$server%$', member.guild.name):gsub('%$user%$', member.user.mentionString)
-		output('blank', client:getChannel(welcomeChannel), nil)
+		output('blank', client:getChannel(welcomeChannel))
 	end
 end)
 
@@ -164,16 +131,16 @@ client:on('guildCreate', function(guild)
 	nickManage(guild:getMember(client.user.id))
 end)
 
-function info(servers, pfp)
+function info()
 	entry.info.content = {
 		title = botName:gsub('^%l', string.upper),
-		thumbnail = {url = pfp},
-		description = 'A general-purpose bot with a variety of useful commands.\nCurrently in ' .. servers .. ' servers.',
+		thumbnail = {url = client:getUser(client.user.id):getAvatarURL() .. '?size=1024'},
+		description = 'A general-purpose bot with a variety of useful commands.\nCurrently in ' .. tostring(#client.guilds) .. ' servers.',
 		footer = {text = 'Created by kat#8931 <3'}
 	}
 end
 
-function help(content)
+function help(_, _, content)
 	local tfields = {}
 	for key, val in pairs(entry) do
 		if content:find('^' .. key) or val.alias and content:find('^' .. val.alias) then
@@ -197,7 +164,7 @@ function help(content)
 end
 
 function say(content, message)
-	if content then
+	if content ~= '' then
 		entry.say.content = content
 		message:delete()
 	else
@@ -205,11 +172,11 @@ function say(content, message)
 	end
 end
 
-function user(content, mention, author)
+function user(_, message, content)
   entry.user.type = 'message'
-  local target = author
+  local target = message.author
 	if mention then
-	  target = mention
+	  target = message.mentionedUsers.first
 	end
 
   local options = {
@@ -235,7 +202,8 @@ function user(content, mention, author)
   end
 end
 
-function emote(emote, content)
+function emote(content, message)
+  emote = message.mentionedEmojis.first
 	if emote then
 		entry.emote.type = 'embed'
 		entry.emote.content = {image = {url = emote.url}}
@@ -250,7 +218,7 @@ function emote(emote, content)
 end
 
 function random(content)
-	if content and content:find('%d+.*,.*%d+') then
+	if content:find('%d+.*,.*%d+') then
 		entry.random.content = math.random(content:match('%-?%d+'), content:match(',.-(%-?%d+)'))
 	else
 		entry.random.content = 'What range would you like to use?'
@@ -271,7 +239,8 @@ function pick(content)
 	end
 end
 
-function server(content, server)
+function server(_, message, content)
+  server = message.guild
 	entry.server.type = 'message'
 
 	local options = {
@@ -324,25 +293,27 @@ function poll(content, message)
 	end
 end
 
-function prefix(content, server, bot, user, emoji, channel)
-	if user then
+function prefix(content, message)
+	if message.mentionedUsers.first then
 		entry.prefix.content = 'You can\'t use a user mention in your prefix.'
-	elseif emoji then
+	elseif message.mentionedEmojis.first then
 		entry.prefix.content = 'You can\'t use an emoji in your prefix.'
-	elseif channel then
+	elseif message.mentionedChannels.first then
 		entry.prefix.content = 'You can\'t use a channel mention in your prefix.'
 	elseif content ~= '' then
-		currentPrefix = write(server, 'prefix', content)
+		currentPrefix = write(message.guild.id, 'prefix', content)
 		entry.prefix.content = 'Changed this server\'s prefix to ' .. currentPrefix
-	  nickManage(bot)
+	  nickManage(message.guild:getMember(client.user.id))
 	else
 		entry.prefix.content = 'What would you like this server\'s prefix to be?'
 	end
 end
 
-function welcome(channel, content, server)
-  welcomeChannel = read(server, 'welcomeChannel', nil)
-	welcomeMessage = read(server, 'welcomeMessage', nil)
+function welcome(content, message)
+  local channel = message.mentionedChannels.first
+  local server = message.guild.id
+  welcomeChannel = read(server, 'welcomeChannel')
+	welcomeMessage = read(server, 'welcomeMessage')
 	entry.welcome.type = 'message'
   if content:lower():find('^set') then
     if channel then
@@ -370,7 +341,8 @@ function welcome(channel, content, server)
   elseif welcomeChannel and welcomeMessage then
     entry.welcome.type = 'embed'
     entry.welcome.content = {
-      title = 'Welcome', fields = {
+      title = 'Welcome',
+      fields = {
         {name = 'Message', value = welcomeMessage, inline = false},
         {name = 'Channel', value = '#' .. client:getChannel(welcomeChannel).name, inline = false}
       }
@@ -382,7 +354,7 @@ function welcome(channel, content, server)
   write(server, 'welcomeMessage', welcomeMessage)
 end
 
-function remind(content, mention, message)
+function remind(content, message)
 	if content:find('%d+%.?%d*[hms]') then
 		local timer = require('timer')
 		entry.remind.content = 'Your reminder has been set!'
@@ -401,17 +373,25 @@ function remind(content, mention, message)
 		end
 
 		timer.sleep(duration[1] * 3600000 + duration[2] * 60000 + duration[3] * 1000) -- convert to milliseconds
-		entry.remind.content = '**Reminder** ' .. mention .. ' '.. text
+		entry.remind.content = '**Reminder** ' .. message.author.mentionString .. ' '.. text
 	else
 		entry.remind.content = 'When would you like me to remind you?'
 	end
 end
 
-function filter(server, content, channel)
+function filter(_, message, content)
+  local server = message.guild.id
 	filterList = read(server, 'filter', false)
 	entry.filter.type = 'message'
 	if content:find('^add.*%S') then
-		table.insert(filterList, content:match('^add%s*(.*)$'))
+	  local addWord = content:match('^add%s*(.*)$')
+	  for key,val in pairs(filterList) do
+	    if val == addWord then
+	      entry.filter.content = 'The above word is already on the filter list.'
+	      return
+	    end
+	  end
+		table.insert(filterList, addWord)
 		entry.filter.content = 'The above word has been added to the filter list.'
 	elseif content:find('^add') then
 		entry.filter.content = 'What word would you like to add?'
@@ -419,9 +399,10 @@ function filter(server, content, channel)
 		local removeWord = content:match('^remove%s*(.*)$')
 		entry.filter.content = 'It appears that \"' .. removeWord .. '\" is not on the filter list.'
 		for key, val in pairs(filterList) do
-		if removeWord == val then
+		  if val == removeWord then
 				table.remove(filterList, key)
 				entry.filter.content = '\"' .. removeWord:gsub('^%l', string.upper) .. '\" has been removed from the filter list.'
+				break
 			end
 		end
 	elseif content:find('^remove') then
@@ -449,7 +430,7 @@ function coin()
 	entry.coin.content = 'You got... ' .. result
 end
 
-function dice(content)
+function dice(_, _, content)
 	local diceCount = 1 -- default roll is 1d6
 	local diceType = 6
 	local sum = 0
@@ -484,18 +465,16 @@ end
 -- writes to config file
 function write(server, option, content)
 	local file = io.open('servers.json', 'r')
-	local search = file:read('*a')
+	local decoded = json.decode(file:read('*a'))
 	file:close()
-	local decoded = json.decode(search)
 
 	if not decoded[server] then
 		decoded[server] = {}
 	end
 
 	decoded[server][option] = content
-	local encoded = json.encode(decoded)
 	local file = io.open('servers.json', 'w+')
-	file:write(encoded)
+	file:write(json.encode(decoded))
 	file:close()
 	return content
 end
@@ -529,7 +508,7 @@ end
 
 -- $prefix changes bot's nickname
 function nickManage(bot)
-	local nickname = nil
+	local nickname
 	if currentPrefix ~= botPrefix then
 		nickname = botName .. ' [' .. currentPrefix .. ']'
 	end
