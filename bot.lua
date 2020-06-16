@@ -1,5 +1,6 @@
 local discordia = require('discordia')
 local json = require('json')
+local timer = require('timer')
 local client = discordia.Client()
 
 --[[
@@ -22,7 +23,7 @@ client:on('ready', function()
 	file:close()
 
 	entry = {
-		ping = {content = 'Pong!', type = 'message', alias = 'pong', description = 'Checks to see if ' .. botName .. ' is online.', usage = 'ping'},
+		ping = {type = 'message', alias = 'pong', description = 'Checks to see if ' .. botName .. ' is online.', usage = 'ping', ftn = ping},
 		info = {type = 'embed', description = 'Gets ' .. botName .. '\'s information.', usage = 'info', ftn = info},
 		help = {type = 'embed', description = 'Gets a list of commands.', usage = 'help (command)', ftn = help},
 		invite = {content = 'https://discord.com/api/oauth2/authorize?client_id=711547275410800701&permissions=8&scope=bot', type = 'message', description = 'Grabs ' .. botName .. '\'s invite link.', usage = 'invite'},
@@ -39,7 +40,7 @@ client:on('ready', function()
 		filter = {description = 'Manages the list of filtered words.', usage = 'filter [option] (word)', note = 'Options include \"add,\" \"remove,\" \"list,\" and \"clear.\"', perms = 8192, ftn = filter},
 		coin = {type = 'message', alias = 'flip', description = 'Flips a coin.', usage = 'coin', ftn = coin},
 		dice = {type = 'message', alias = 'roll', description = 'Rolls dice.', usage = 'dice ((number of dice)[d][number of faces])', note =  'The default roll is 1d6.', ftn = dice},
-	  purge = {type = 'message', alias = 'bulk', description = 'Bulk deletes messages.', usage = 'purge [number of messages]', note = 'This command cannot delete messages older than two weeks.', perms = 8192, ftn = purge}
+		purge = {type = 'message', alias = 'bulk', description = 'Bulk deletes messages.', usage = 'purge [number of messages]', note = 'This command cannot delete messages older than two weeks.', perms = 8192, ftn = purge}
 	}
 
 	-- alphabetize
@@ -136,6 +137,10 @@ end)
 client:on('guildCreate', function(guild)
 	nickManage(guild:getMember(client.user.id))
 end)
+
+function ping(_, message)
+  entry.ping.content = 'Pong! ' .. math.abs(math.floor((os.time() - message.createdAt) * 1000)) .. ' ms'
+end
 
 function info()
 	entry.info.content = {
@@ -355,7 +360,6 @@ end
 
 function remind(content, message)
 	if content:find('%d+%.?%d*[hms]') then
-		local timer = require('timer')
 		entry.remind.content = 'Your reminder has been set!'
 		output('remind', message.channel, message, message.guild:getMember(client.user.id))
 
@@ -447,15 +451,18 @@ function dice(_, _, content)
 	entry.dice.content = 'You got... ' .. sum .. ' 🎲'
 end
 
+-- note: bulk deletions are limited to 100
 function purge(content, message)
   local purgeCount = tonumber(content:match('%d+'))
   if purgeCount then
+    message:delete()
+    entry.purge.content = purgeCount .. ' messages have been deleted.'
+    message.channel:bulkDelete(message.channel:getMessages(purgeCount % 100))
     while purgeCount > 100 do
+      timer.sleep(100) -- wait for messages to load
       message.channel:bulkDelete(message.channel:getMessages(100))
       purgeCount = purgeCount - 100
     end
-    message.channel:bulkDelete(message.channel:getMessages(purgeCount))
-    entry.purge.content = purgeCount .. ' messages have been deleted.'
   else
     entry.purge.content = 'How many messages should I delete?'
   end
