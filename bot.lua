@@ -26,7 +26,7 @@ client:on('ready', function()
 		ping = {content = 'Pong!', type = 'message', alias = 'pong', description = 'Checks to see if ' .. botName .. ' is online.', usage = 'ping'},
 		info = {type = 'embed', description = 'Gets ' .. botName .. '\'s information.', usage = 'info', ftn = info},
 		help = {type = 'embed', description = 'Gets a list of commands.', usage = 'help (command)', ftn = help},
-		invite = {content = 'https://discord.com/api/oauth2/authorize?client_id=711547275410800701&permissions=8&scope=bot', type = 'message', description = 'Grabs ' .. botName .. '\'s invite link.', usage = 'invite'},
+		invite = {content = 'https://discord.com/api/oauth2/authorize?client_id=711547275410800701&permissions=8&scope=bot', type = 'message', description = 'Gets ' .. botName .. '\'s invite link.', usage = 'invite'},
 		say = {type = 'message', alias = 'echo', description = 'Says something.', usage = 'say [text]', ftn = say},
 		user = {type = 'embed', description = 'Gets information about a user.', usage = 'user (mention) (option)', note = 'Options include \"avatar,\" \"join,\" and \"age.\"', ftn = user},
 		emote = {alias = 'emoji', description = 'Gets an emote as an image.', usage = 'emote [emote]', ftn = emote},
@@ -66,7 +66,7 @@ client:on('messageCreate', function(message)
 		return
 	end
 
-	-- delete words with filtered terms
+	-- delete messages with filtered terms
 	filterList = read(message.guild.id, 'filter')
 	if filterList then
 		for _, val in pairs(filterList) do
@@ -143,7 +143,7 @@ function info()
 		title = botName:gsub('^%l', string.upper),
 		thumbnail = {url = client:getUser(client.user.id):getAvatarURL() .. '?size=1024'},
 		description = 'A general-purpose bot with a variety of useful commands.\nCurrently in ' .. tostring(#client.guilds) .. ' servers.',
-		footer = {text = 'Created by kat#8931 <3'}
+		footer = {text = 'Made by kat#8931 <3'}
 	}
 end
 
