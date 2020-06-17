@@ -1,6 +1,6 @@
-local discordia = require('discordia')
-local json = require('json')
-local timer = require('timer')
+local discordia = require 'discordia'
+local json = require 'json'
+local timer = require 'timer'
 local client = discordia.Client()
 
 --[[
@@ -23,7 +23,7 @@ client:on('ready', function()
 	file:close()
 
 	entry = {
-		ping = {type = 'message', alias = 'pong', description = 'Checks to see if ' .. botName .. ' is online.', usage = 'ping', ftn = ping},
+		ping = {content = 'Pong!', type = 'message', alias = 'pong', description = 'Checks to see if ' .. botName .. ' is online.', usage = 'ping'},
 		info = {type = 'embed', description = 'Gets ' .. botName .. '\'s information.', usage = 'info', ftn = info},
 		help = {type = 'embed', description = 'Gets a list of commands.', usage = 'help (command)', ftn = help},
 		invite = {content = 'https://discord.com/api/oauth2/authorize?client_id=711547275410800701&permissions=8&scope=bot', type = 'message', description = 'Grabs ' .. botName .. '\'s invite link.', usage = 'invite'},
@@ -34,13 +34,13 @@ client:on('ready', function()
 		pick = {type = 'message', alias = 'choose', description = 'Picks between multiple options.', usage = 'pick [option] or [option] . . .', ftn = pick},
 		server = {alias = 'guild', description = 'Gets information about the server.', usage = 'server (option)', note = 'Options include \"icon,\" \"banner,\" \"splash,\" \"owner,\" \"members,\" \"name,\" and \"age.\"', ftn = server},
 		poll = {alias = 'vote', description = 'Creates a poll.', usage = 'poll {[question]} {[option]} {[option]} . . .', ftn = poll},
-		prefix = {type = 'message', description = 'Changes ' .. botName .. '\'s prefix.', usage = 'prefix [option]', perms = 8, ftn = prefix},
-		welcome = {description = 'Configures a welcome message.', usage = 'welcome [option] (arguments)', note = 'Options include \"set,\" \"current,\" and \"clear.\" \"$server$\" and \"$user$\" are replaced with the server name and the new user, respectively.', perms = 8, ftn = welcome},
+		prefix = {type = 'message', description = 'Changes ' .. botName .. '\'s prefix.', usage = 'prefix [option]', perms = 'administrator', ftn = prefix},
+		welcome = {description = 'Configures a welcome message.', usage = 'welcome [option] (arguments)', note = 'Options include \"set,\" \"current,\" and \"clear.\" \"$server$\" and \"$user$\" are replaced with the server name and the new user, respectively.', perms = 'administrator', ftn = welcome},
 		remind = {type = 'message', alias = 'reminder', description = 'Sets a reminder.', usage = 'remind [duration][h/m/s] (message)', ftn = remind},
-		filter = {description = 'Manages the list of filtered words.', usage = 'filter [option] (word)', note = 'Options include \"add,\" \"remove,\" \"list,\" and \"clear.\"', perms = 8192, ftn = filter},
+		filter = {description = 'Manages the list of filtered words.', usage = 'filter [option] (word)', note = 'Options include \"add,\" \"remove,\" \"list,\" and \"clear.\"', perms = 'manageMessages', ftn = filter},
 		coin = {type = 'message', alias = 'flip', description = 'Flips a coin.', usage = 'coin', ftn = coin},
-		dice = {type = 'message', alias = 'roll', description = 'Rolls dice.', usage = 'dice ((number of dice)[d][number of faces])', note =  'The default roll is 1d6.', ftn = dice},
-		purge = {type = 'message', alias = 'bulk', description = 'Bulk deletes messages.', usage = 'purge [number of messages]', note = 'This command cannot delete messages older than two weeks.', perms = 8192, ftn = purge}
+		dice = {type = 'message', alias = 'roll', description = 'Rolls dice.', usage = 'dice ((number of dice)[d][number of faces])', note = 'The default roll is 1d6.', ftn = dice},
+		purge = {type = 'message', alias = 'bulk', description = 'Bulk deletes messages.', usage = 'purge [number of messages]', note = 'This command cannot delete messages older than two weeks.', perms = 'manageMessages', ftn = purge}
 	}
 
 	-- alphabetize
@@ -70,7 +70,7 @@ client:on('messageCreate', function(message)
 	filterList = read(message.guild.id, 'filter')
 	if filterList then
 		for _, val in pairs(filterList) do
-			if message.content:lower():find(val) and not message.member:hasPermission(8) then
+			if message.content:lower():find(val) and not message.member:hasPermission('administrator') then
 				message:delete()
 				return
 			end
@@ -107,12 +107,12 @@ client:on('messageCreate', function(message)
 			-- format message content
 			cleanContent = message.content:gsub('%s+', ' '):match(key .. '%s*(.*)$')
 			if not cleanContent then
-			  cleanContent = ''
+				cleanContent = ''
 			end
 
 			-- dynamic commands
 			if val.ftn then
-			  val.ftn(cleanContent, message, cleanContent:lower())
+				val.ftn(cleanContent, message, cleanContent:lower())
 			end
 
 			-- send message
@@ -137,10 +137,6 @@ end)
 client:on('guildCreate', function(guild)
 	nickManage(guild:getMember(client.user.id))
 end)
-
-function ping(_, message)
-  entry.ping.content = 'Pong! ' .. math.abs(math.floor((os.time() - message.createdAt) * 1000)) .. ' ms'
-end
 
 function info()
 	entry.info.content = {
@@ -184,37 +180,37 @@ function say(content, message)
 end
 
 function user(_, message, content)
-  entry.user.type = 'message'
-  local target = message.author
-	if mention then
-	  target = message.mentionedUsers.first
+	entry.user.type = 'message'
+	local target = message.author
+	if message.mentionedUsers then
+		target = message.mentionedUsers.first
 	end
 
-  local options = {
-    avatar = {type = 'image', content = target:getAvatarURL(), fail = 'It doesn\'t look like this user has an avatar...'},
-    age = {type = 'message', content = os.date(target.tag:gsub('^%l', string.upper) .. ' created their account on %b %d, %Y at %H:%M.', target.createdAt)},
-    join = {type = 'message', content = os.date(target.tag:gsub('^%l', string.upper) .. ' joined the server on %b %d, %Y at %H:%M.', target.joinedAt)}
-  }
+	local options = {
+		avatar = {type = 'image', content = target:getAvatarURL(), fail = 'It doesn\'t look like this user has an avatar...'},
+		age = {type = 'message', content = os.date(target.tag:gsub('^%l', string.upper) .. ' created their account on %b %d, %Y at %H:%M.', target.createdAt)},
+		join = {type = 'message', content = os.date(target.tag:gsub('^%l', string.upper) .. ' joined the server on %b %d, %Y at %H:%M.', target.joinedAt)}
+	}
 
-  for key, val in pairs(options) do
-    if content:find('^' .. key) or content:find(target.id .. '>%s*' .. key) then
-      entry.user.type, entry.user.content = optionSet(val)
-      return
-    end
-  end
-  entry.user.type = 'embed'
-  entry.user.content = {
-    title = target.tag:gsub('^%l', string.upper),
-    thumbnail = {},
-    description = os.date('This account was created on %b %d, %Y at %H:%M.', target.createdAt)
-  }
-  if target:getAvatarURL() then
-    entry.user.content.thumbnail = {url = target:getAvatarURL() .. '?size=1024'}
-  end
+	for key, val in pairs(options) do
+			if content:find('^' .. key) or content:find(target.id .. '>%s*' .. key) then
+				entry.user.type, entry.user.content = optionSet(val)
+				return
+			end
+	end
+	entry.user.type = 'embed'
+	entry.user.content = {
+		title = target.tag:gsub('^%l', string.upper),
+		thumbnail = {},
+		description = os.date('This account was created on %b %d, %Y at %H:%M.', target.createdAt)
+	}
+	if target:getAvatarURL() then
+		entry.user.content.thumbnail = {url = target:getAvatarURL() .. '?size=1024'}
+	end
 end
 
 function emote(content, message)
-  local emote = message.mentionedEmojis.first
+	local emote = message.mentionedEmojis.first
 	if emote then
 		entry.emote.type = 'embed'
 		entry.emote.content = {image = {url = emote.url}}
@@ -251,7 +247,7 @@ function pick(content)
 end
 
 function server(_, message, content)
-  server = message.guild
+	server = message.guild
 	entry.server.type = 'message'
 
 	local options = {
@@ -266,7 +262,7 @@ function server(_, message, content)
 
 	for key, val in pairs(options) do
 		if content:find('^' .. key) then
-      entry.server.type, entry.server.content = optionSet(val)
+			entry.server.type, entry.server.content = optionSet(val)
 			return
 		end
 	end
@@ -274,7 +270,7 @@ function server(_, message, content)
 	entry.server.content = {
 		title = server.name,
 		thumbnail = {},
-		description = 'This server is owned by ' .. server.owner.user.tag .. '.\n It currently has ' .. tostring(server.totalMemberCount) .. ' members.'
+		description = 'This server is owned by ' .. server.owner.user.tag .. '.\nIt currently has ' .. tostring(server.totalMemberCount) .. ' members.'
 	}
 	if server.iconURL then
 		entry.server.content.thumbnail = {url = server.iconURL}
@@ -290,7 +286,7 @@ function poll(content, message)
 		emotes = {'🇦','🇧','🇨','🇩','🇪','🇫','🇬','🇭','🇮','🇯','🇰','🇱','🇲','🇳','🇴','🇵','🇶','🇷','🇸','🇹'}
 
 		while content:find('}{.*}') and entry.poll.code <= 20 do
-		  content = content:match('}(.*)$')
+			content = content:match('}(.*)$')
 			entry.poll.code = entry.poll.code + 1
 			options = options .. '\n\n'..emotes[entry.poll.code] .. ' ' .. content:match('{(.-)}')
 		end
@@ -313,49 +309,49 @@ function prefix(content, message)
 	elseif content ~= '' then
 		currentPrefix = write(message.guild.id, 'prefix', content)
 		entry.prefix.content = 'Changed this server\'s prefix to ' .. currentPrefix
-	  nickManage(message.guild:getMember(client.user.id))
+		nickManage(message.guild:getMember(client.user.id))
 	else
 		entry.prefix.content = 'What would you like this server\'s prefix to be?'
 	end
 end
 
 function welcome(content, message)
-  local channel = message.mentionedChannels.first
-  local server = message.guild.id
-  welcomeChannel = read(server, 'welcomeChannel')
+	local channel = message.mentionedChannels.first
+	local server = message.guild.id
+	welcomeChannel = read(server, 'welcomeChannel')
 	welcomeMessage = read(server, 'welcomeMessage')
 	entry.welcome.type = 'message'
-  if content:lower():find('^set') then
-    if channel then
-      welcomeMessage = content:match('^set%s*(.-)%s*' .. channel.mentionString) .. content:match(channel.mentionString .. '%s*(.*)$')
-      if not welcomeMessage or welcomeMessage == '' then
-        entry.welcome.content = 'What message would you like me to send?'
-        return
-      else
-        welcomeChannel = channel.id
-  			entry.welcome.content = 'The welcome message has been set.'
-      end
-  	else
-  	  entry.welcome.content = 'What channel would you like me to send the message in?'
-    end
-  elseif content:lower():find('^clear') then
-    welcomeChannel = nil
-    welcomeMessage = nil
-    entry.welcome.content = 'The welcome message has been cleared.'
-  elseif welcomeChannel and welcomeMessage then
-    entry.welcome.type = 'embed'
-    entry.welcome.content = {
-      title = 'Welcome',
-      fields = {
-        {name = 'Message', value = welcomeMessage},
-        {name = 'Channel', value = '#' .. client:getChannel(welcomeChannel).name}
-      }
-    }
+	if content:lower():find('^set') then
+		if channel then
+			welcomeMessage = content:match('^set%s*(.-)%s*' .. channel.mentionString) .. content:match(channel.mentionString .. '%s*(.*)$')
+			if not welcomeMessage or welcomeMessage == '' then
+				entry.welcome.content = 'What message would you like me to send?'
+				return
+			else
+				welcomeChannel = channel.id
+				entry.welcome.content = 'The welcome message has been set.'
+			end
+		else
+			entry.welcome.content = 'What channel would you like me to send the message in?'
+		end
+	elseif content:lower():find('^clear') then
+		welcomeChannel = nil
+		welcomeMessage = nil
+		entry.welcome.content = 'The welcome message has been cleared.'
+	elseif welcomeChannel and welcomeMessage then
+		entry.welcome.type = 'embed'
+		entry.welcome.content = {
+			title = 'Welcome',
+			fields = {
+				{name = 'Message', value = welcomeMessage},
+				{name = 'Channel', value = '#' .. client:getChannel(welcomeChannel).name}
+			}
+		}
 	else
-	  entry.welcome.content = 'It doesn\'t look like this server has a welcome message...\nUse `' .. currentPrefix .. 'welcome set [channel] [message]` to make one!'
-  end
-  write(server, 'welcomeChannel', welcomeChannel)
-  write(server, 'welcomeMessage', welcomeMessage)
+		entry.welcome.content = 'It doesn\'t look like this server has a welcome message...\nUse `' .. currentPrefix .. 'welcome set [channel] [message]` to make one!'
+	end
+	write(server, 'welcomeChannel', welcomeChannel)
+	write(server, 'welcomeMessage', welcomeMessage)
 end
 
 function remind(content, message)
@@ -383,17 +379,17 @@ function remind(content, message)
 end
 
 function filter(_, message, content)
-  local server = message.guild.id
+	local server = message.guild.id
 	filterList = read(server, 'filter', false)
 	entry.filter.type = 'message'
 	if content:find('^add.*%S') then
-	  local addWord = content:match('^add%s*(.*)$')
-	  for key,val in pairs(filterList) do
-	    if val == addWord then
-	      entry.filter.content = 'The above word is already on the filter list.'
-	      return
-	    end
-	  end
+		local addWord = content:match('^add%s*(.*)$')
+		for key,val in pairs(filterList) do
+			if val == addWord then
+				entry.filter.content = 'The above word is already on the filter list.'
+				return
+			end
+		end
 		table.insert(filterList, addWord)
 		entry.filter.content = 'The above word has been added to the filter list.'
 	elseif content:find('^add') then
@@ -402,7 +398,7 @@ function filter(_, message, content)
 		local removeWord = content:match('^remove%s*(.*)$')
 		entry.filter.content = 'It appears that \"' .. removeWord .. '\" is not on the filter list.'
 		for key, val in pairs(filterList) do
-		  if val == removeWord then
+			if val == removeWord then
 				table.remove(filterList, key)
 				entry.filter.content = '\"' .. removeWord:gsub('^%l', string.upper) .. '\" has been removed from the filter list.'
 				break
@@ -414,13 +410,13 @@ function filter(_, message, content)
 		filterList = {}
 		entry.filter.content = 'The filter list has been cleared.'
 	elseif filterList[1] then
-  	entry.filter.type = 'embed'
-    entry.filter.content = {title = 'Filtered Words', description = ''}
-  	for _, val in pairs(filterList) do
-  		entry.filter.content.description = entry.filter.content.description .. '\n' .. val
-  	end
-  else
-    entry.filter.content = 'It doesn\'t look like this server has a filter list...\nUse `' .. currentPrefix .. 'filter add [word]` to start one!'
+		entry.filter.type = 'embed'
+		entry.filter.content = {title = 'Filtered Words', description = ''}
+		for _, val in pairs(filterList) do
+			entry.filter.content.description = entry.filter.content.description .. '\n' .. val
+		end
+	else
+		entry.filter.content = 'It doesn\'t look like this server has a filter list...\nUse `' .. currentPrefix .. 'filter add [word]` to start one!'
 	end
 	write(server, 'filter', filterList)
 end
@@ -453,19 +449,19 @@ end
 
 -- note: bulk deletions are limited to 100
 function purge(content, message)
-  local purgeCount = tonumber(content:match('%d+'))
-  if purgeCount then
-    message:delete()
-    entry.purge.content = purgeCount .. ' messages have been deleted.'
-    message.channel:bulkDelete(message.channel:getMessages(purgeCount % 100))
-    while purgeCount > 100 do
-      timer.sleep(100) -- wait for messages to load
-      message.channel:bulkDelete(message.channel:getMessages(100))
-      purgeCount = purgeCount - 100
-    end
-  else
-    entry.purge.content = 'How many messages should I delete?'
-  end
+	local purgeCount = tonumber(content:match('%d+'))
+	if purgeCount then
+		message:delete()
+		entry.purge.content = purgeCount .. ' messages have been deleted.'
+		message.channel:bulkDelete(message.channel:getMessages(purgeCount % 100))
+		while purgeCount > 100 do
+			timer.sleep(100) -- wait for messages to load
+			message.channel:bulkDelete(message.channel:getMessages(100))
+			purgeCount = purgeCount - 100
+		end
+	else
+		entry.purge.content = 'How many messages should I delete?'
+	end
 end
 
 -- send the message
@@ -477,7 +473,9 @@ function output(key, channel, message, bot)
 		entry[key].content.color = botColor
 		sentID = channel:send{embed = entry[key].content}
 	end
-	if key == 'poll' and message then
+	if key == 'ping' then
+		pingCalc(message, sentID)
+	elseif key == 'poll' then
 		pollReact(message, sentID)
 	end
 end
@@ -513,11 +511,11 @@ function read(server, option, default)
 	return variable
 end
 
--- iterate through an options table
+-- set from an options table
 function optionSet(val)
-  if val.content then
+	if val.content then
 		if val.type == 'image' then
-		  return 'embed', {image = {url = val.content .. '?size=1024'}}
+			return 'embed', {image = {url = val.content .. '?size=1024'}}
 		elseif val.type == 'message' then
 			return 'message', val.content
 		end
@@ -533,6 +531,11 @@ function nickManage(bot)
 		nickname = botName .. ' [' .. currentPrefix .. ']'
 	end
 	bot:setNickname(nickname)
+end
+
+-- $ping calculates latency
+function pingCalc(message, sentID)
+	sentID:setContent('Pong! ' .. math.floor(math.abs(sentID.createdAt - message.createdAt) * 1000) .. ' ms')
 end
 
 -- $poll adds reactions
