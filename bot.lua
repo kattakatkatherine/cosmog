@@ -28,7 +28,7 @@ client:on('ready', function()
 		help = {type = 'embed', description = 'Gets a list of commands.', usage = 'help (command)', ftn = help},
 		invite = {content = 'https://discord.com/api/oauth2/authorize?client_id=711547275410800701&permissions=8&scope=bot', type = 'message', description = 'Gets ' .. botName .. '\'s invite link.', usage = 'invite'},
 		say = {type = 'message', alias = 'echo', description = 'Says something.', usage = 'say [text]', ftn = say},
-		user = {type = 'embed', description = 'Gets information about a user.', usage = 'user (mention) (option)', note = 'Options include \"avatar,\" \"join,\" and \"age.\"', ftn = user},
+		user = {type = 'embed', alias = 'member', description = 'Gets information about a user.', usage = 'user (mention) (option)', note = 'Options include \"avatar,\" \"join,\" and \"age.\"', ftn = user},
 		emote = {alias = 'emoji', description = 'Gets an emote as an image.', usage = 'emote [emote]', ftn = emote},
 		random = {type = 'message', alias = 'rand', description = 'Gets a random number between two integers.', usage = 'random [integer], [integer]', ftn = random},
 		pick = {type = 'message', alias = 'choose', description = 'Picks between multiple options.', usage = 'pick [option] or [option] . . .', ftn = pick},
@@ -105,7 +105,11 @@ client:on('messageCreate', function(message)
 			math.random(); math.random(); math.random()
 
 			-- format message content
-			cleanContent = message.content:gsub('%s+', ' '):match(key .. '%s*(.*)$')
+			local cmd = key
+			if not message.content:find('^' .. currentPrefix .. key) then
+				cmd = val.alias
+			end
+			cleanContent = message.content:gsub('%s+', ' '):match(cmd .. '%s*(.*)$')
 			if not cleanContent then
 				cleanContent = ''
 			end
@@ -285,6 +289,7 @@ function poll(content, message)
 		local options = ''
 		emotes = {'🇦','🇧','🇨','🇩','🇪','🇫','🇬','🇭','🇮','🇯','🇰','🇱','🇲','🇳','🇴','🇵','🇶','🇷','🇸','🇹'}
 
+		-- message reactions are limited to 20
 		while content:find('}{.*}') and entry.poll.code <= 20 do
 			content = content:match('}(.*)$')
 			entry.poll.code = entry.poll.code + 1
@@ -316,8 +321,7 @@ function prefix(content, message)
 end
 
 function welcome(content, message)
-	local channel = message.mentionedChannels.first
-	local server = message.guild.id
+	local channel, server = message.mentionedChannels.first, message.guild.id
 	welcomeChannel = read(server, 'welcomeChannel')
 	welcomeMessage = read(server, 'welcomeMessage')
 	entry.welcome.type = 'message'
@@ -430,9 +434,7 @@ function coin()
 end
 
 function dice(_, _, content)
-	local diceCount = 1 -- default roll is 1d6
-	local diceType = 6
-	local sum = 0
+	local diceCount, diceType, sum = 1, 6, 0 -- default roll is 1d6
 	if content:find('%d*d%d+') then
 		if content:find('%d+d') then
 			content = content:match('%d+.*')
@@ -441,13 +443,13 @@ function dice(_, _, content)
 		content = content:match('d(.*)$')
 		diceType = content:match('%d+')
 	end
-	for i = 1, diceCount, 1 do
+	for i = 1, diceCount do
 		sum = sum + math.random(diceType)
 	end
 	entry.dice.content = 'You got... ' .. sum .. ' 🎲'
 end
 
--- note: bulk deletions are limited to 100
+-- bulk deletions are limited to 100
 function purge(content, message)
 	local purgeCount = tonumber(content:match('%d+'))
 	if purgeCount then
@@ -540,7 +542,7 @@ end
 
 -- $poll adds reactions
 function pollReact(message, sentID)
-	for i = 1, entry.poll.code, 1 do
+	for i = 1, entry.poll.code do
 		sentID:addReaction(emotes[i])
 	end
 end
