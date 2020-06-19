@@ -2,7 +2,7 @@
 A general-purpose Discord bot with a variety of useful commands.
 
 Made in Lua with [Discordia](https://github.com/SinisterRectus/Discordia/wiki).<br>
-Summer 2020.
+June 2020.
 
 ## Features
 Command | Function

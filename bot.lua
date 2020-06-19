@@ -6,7 +6,7 @@ local client = discordia.Client()
 --[[
 	Cosmog
 	Katherine Gearhart
-	Summer 2020
+	June 2020
 ]]
 
 client:on('ready', function()
