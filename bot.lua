@@ -186,7 +186,7 @@ end
 function user(_, message, content)
 	entry.user.type = 'message'
 	local target = message.author
-	if message.mentionedUsers then
+	if message.mentionedUsers.first then
 		target = message.mentionedUsers.first
 	end
 
