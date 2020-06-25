@@ -191,7 +191,7 @@ function user(_, message, content)
 	end
 
 	local options = {
-		avatar = {type = 'image', content = target:getAvatarURL(), fail = 'It doesn\'t look like this user has an avatar...'},
+		avatar = {type = 'image', content = target:getAvatarURL(), fail = 'an avatar'},
 		age = {type = 'message', content = os.date(target.tag:gsub('^%l', string.upper) .. ' created their account on %b %d, %Y at %H:%M.', target.createdAt)},
 		join = {type = 'message', content = os.date(target.tag:gsub('^%l', string.upper) .. ' joined the server on %b %d, %Y at %H:%M.', target.joinedAt)}
 	}
@@ -244,7 +244,7 @@ function pick(content)
 			content = content:match(' or (.*)$')
 		end
 		table.insert(options, content)
-		entry.pick.content = 'I pick... ' .. options[math.random(#options)]
+		entry.pick.content = 'I pick… ' .. options[math.random(#options)]
 	else
 		entry.pick.content = 'What options should I pick from?'
 	end
@@ -352,7 +352,7 @@ function welcome(content, message)
 			}
 		}
 	else
-		entry.welcome.content = 'It doesn\'t look like this server has a welcome message...\nUse `' .. currentPrefix .. 'welcome set [channel] [message]` to make one!'
+		entry.welcome.content = 'It doesn\'t look like this server has a welcome message…\nUse `' .. currentPrefix .. 'welcome set [channel] [message]` to make one!'
 	end
 	write(server, 'welcomeChannel', welcomeChannel)
 	write(server, 'welcomeMessage', welcomeMessage)
@@ -420,7 +420,7 @@ function filter(_, message, content)
 			entry.filter.content.description = entry.filter.content.description .. '\n' .. val
 		end
 	else
-		entry.filter.content = 'It doesn\'t look like this server has a filter list...\nUse `' .. currentPrefix .. 'filter add [word]` to start one!'
+		entry.filter.content = 'It doesn\'t look like this server has a filter list…\nUse `' .. currentPrefix .. 'filter add [word]` to start one!'
 	end
 	write(server, 'filter', filterList)
 end
@@ -430,7 +430,7 @@ function coin()
 	if math.random(2) == 1 then
 		result = 'tails ' .. client:getEmoji('717821935924543560').mentionString
 	end
-	entry.coin.content = 'You got... ' .. result
+	entry.coin.content = 'You got… ' .. result
 end
 
 function dice(_, _, content)
@@ -446,7 +446,7 @@ function dice(_, _, content)
 	for i = 1, diceCount do
 		sum = sum + math.random(diceType)
 	end
-	entry.dice.content = 'You got... ' .. sum .. ' 🎲'
+	entry.dice.content = 'You got… ' .. sum .. ' 🎲'
 end
 
 -- bulk deletions are limited to 100
@@ -522,7 +522,7 @@ function optionSet(val)
 			return 'message', val.content
 		end
 	else
-		return 'message', 'It doesn\'t look like this server has ' .. val.fail .. '...'
+		return 'message', 'It doesn\'t look like this server has ' .. val.fail .. '…'
 	end
 end
 
