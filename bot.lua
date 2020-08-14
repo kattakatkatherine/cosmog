@@ -40,7 +40,13 @@ client:on('ready', function()
 		filter = {description = 'Manages the list of filtered words.', usage = 'filter [option] (word)', note = 'Options include \"add,\" \"remove,\" \"list,\" and \"clear.\"', perms = 'manageMessages', ftn = filter},
 		coin = {type = 'message', alias = 'flip', description = 'Flips a coin.', usage = 'coin', ftn = coin},
 		dice = {type = 'message', alias = 'roll', description = 'Rolls dice.', usage = 'dice ((number of dice)[d][number of faces])', note = 'The default roll is 1d6.', ftn = dice},
-		purge = {type = 'message', alias = 'bulk', description = 'Bulk deletes messages.', usage = 'purge [number of messages]', note = 'This command cannot delete messages older than two weeks.', perms = 'manageMessages', ftn = purge}
+		purge = {type = 'message', alias = 'bulk', description = 'Bulk deletes messages.', usage = 'purge [number of messages]', note = 'This command cannot delete messages older than two weeks.', perms = 'manageMessages', ftn = purge},
+		hug = {description = 'Hug someone!', usage = 'hug [mention]', ftn = hug},
+		pat = {description = 'Pat someone!', usage = 'pat [mention]', ftn = pat},
+		kiss = {description = 'Kiss someone!', usage = 'kiss [mention]', ftn = kiss},
+		snuggle = {alias = 'cuddle', description = 'Cuddle someone!', usage = 'snuggle [mention]', ftn = snuggle},
+		lick = {description = 'Lick someone!', usage = 'lick [mention]', ftn = lick},
+		slap = {description = 'Slap someone!', usage = 'slap [mention]', ftn = slap}
 	}
 
 	-- alphabetize
@@ -184,11 +190,11 @@ function say(content, message)
 end
 
 function user(_, message, content)
-	entry.user.type = 'message'
 	local target = message.author
 	if message.mentionedUsers.first then
 		target = message.mentionedUsers.first
 	end
+	entry.user.type = 'message'
 
 	local options = {
 		avatar = {type = 'image', content = target:getAvatarURL(), fail = 'an avatar'},
@@ -251,7 +257,7 @@ function pick(content)
 end
 
 function server(_, message, content)
-	server = message.guild
+	local server = message.guild
 	entry.server.type = 'message'
 
 	local options = {
@@ -370,7 +376,7 @@ function remind(content, message)
 				duration[key] = 0
 			end
 		end
-		local text = content:match('^(.-)%s*%d+%.?%d*[hms]') .. content:match('%d+%.?%d*[hms]%s*(.-)$')
+		local text = content:match('%d+%.?%d*[hms]%s*(.-)$')
 		if not text then
 			text = ''
 		end
@@ -466,6 +472,30 @@ function purge(content, message)
 	end
 end
 
+function hug(_, message)
+	entry.hug = actionSet(message, entry.hug, 'hug', 'https://media.discordapp.net/attachments/711769236183187556/742504457518055484/image1.gif')
+end
+
+function pat(_, message)
+	entry.pat = actionSet(message, entry.pat, 'pat', 'https://cdn.discordapp.com/attachments/711769236183187556/742504456419016714/image0.gif')
+end
+
+function kiss(_, message)
+	entry.kiss = actionSet(message, entry.kiss, 'kiss', 'https://cdn.discordapp.com/attachments/711769236183187556/743240532955758592/ByTBhp_vZ.gif')
+end
+
+function snuggle(_, message)
+	entry.snuggle = actionSet(message, entry.snuggle, 'cuddle', 'https://cdn.discordapp.com/attachments/711769236183187556/743239317660631141/tenor.gif')
+end
+
+function slap(_, message)
+	entry.slap = actionSet(message, entry.slap, 'slap', 'https://cdn.discordapp.com/attachments/711769236183187556/743236803514990592/SJdXoVguf.gif?')
+end
+
+function lick(_, message)
+	entry.lick = actionSet(message, entry.lick, 'lick', 'https://cdn.discordapp.com/attachments/711769236183187556/743234733785481367/Syg8gx0OP-.gif')
+end
+
 -- send the message
 function output(key, channel, message, bot)
 	local sentID
@@ -524,6 +554,23 @@ function optionSet(val)
 	else
 		return 'message', 'It doesn\'t look like this server has ' .. val.fail .. '…'
 	end
+end
+
+function actionSet(message, val, action, image)
+	target = message.mentionedUsers.first
+	val.type = 'message'
+
+	if target then
+		val.type = 'embed'
+		val.content = {
+			description = '**' .. target.name:gsub('^%l', string.upper).. '**, you got a ' .. action .. ' from **' .. message.author.name .. '**',
+			image = {url = image .. '?size=1024'}
+		}
+		return val
+	end
+
+	val.content = 'Who do you want to ' .. action .. '?'
+	return val
 end
 
 -- $prefix changes bot's nickname
