@@ -45,8 +45,9 @@ client:on('ready', function()
 		pat = {description = 'Pat someone!', usage = 'pat [mention]', ftn = pat},
 		kiss = {description = 'Kiss someone!', usage = 'kiss [mention]', ftn = kiss},
 		snuggle = {alias = 'cuddle', description = 'Cuddle someone!', usage = 'snuggle [mention]', ftn = snuggle},
+		slap = {description = 'Slap someone!', usage = 'slap [mention]', ftn = slap},
 		lick = {description = 'Lick someone!', usage = 'lick [mention]', ftn = lick},
-		slap = {description = 'Slap someone!', usage = 'slap [mention]', ftn = slap}
+		poke = {description = 'Poke someone!', usage = 'poke [mention]', ftn = poke}
 	}
 
 	-- alphabetize
@@ -489,12 +490,17 @@ function snuggle(_, message)
 end
 
 function slap(_, message)
-	entry.slap = actionSet(message, entry.slap, 'slap', 'https://cdn.discordapp.com/attachments/711769236183187556/743236803514990592/SJdXoVguf.gif?')
+	entry.slap = actionSet(message, entry.slap, 'slap', 'https://cdn.discordapp.com/attachments/711769236183187556/743236803514990592/SJdXoVguf.gif')
 end
 
 function lick(_, message)
 	entry.lick = actionSet(message, entry.lick, 'lick', 'https://cdn.discordapp.com/attachments/711769236183187556/743234733785481367/Syg8gx0OP-.gif')
 end
+
+function poke(_, message)
+	entry.poke = actionSet(message, entry.poke, 'poke', 'https://cdn.discordapp.com/attachments/711769236183187556/743858315460739102/HJZpLxkKDb.gif')
+end
+
 
 -- send the message
 function output(key, channel, message, bot)
