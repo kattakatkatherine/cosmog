@@ -296,8 +296,8 @@ function poll(content, message)
 		emotes = {'🇦','🇧','🇨','🇩','🇪','🇫','🇬','🇭','🇮','🇯','🇰','🇱','🇲','🇳','🇴','🇵','🇶','🇷','🇸','🇹'}
 
 		-- message reactions are limited to 20
-		while content:find('}{.*}') and entry.poll.code <= 20 do
-			content = content:match('}(.*)$')
+		while content:find('}%s-{.*}') and entry.poll.code <= 20 do
+			content = content:match('}%s-(.*)$')
 			entry.poll.code = entry.poll.code + 1
 			options = options .. '\n\n'..emotes[entry.poll.code] .. ' ' .. content:match('{(.-)}')
 		end
