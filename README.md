@@ -12,8 +12,12 @@ dice | Rolls dice.
 emote | Gets an emote as an image.
 filter | Manages the list of filtered words.
 help | Gets a list of commands.
+hug | Hug someone!
 info | Gets Cosmog's information.
 invite | Gets Cosmog's invite link.
+kiss | Kiss someone!
+lick | Lick someone!
+pat | Pat someone!
 pick | Picks between multiple options.
 ping | Checks to see if Cosmog is online.
 poll | Creates a poll.
@@ -23,6 +27,8 @@ random | Gets a random number between two integers.
 remind | Sets a reminder.
 say | Says something.
 server | Gets information about the server.
+slap | Slap someone!
+snuggle | Cuddle someone!
 user | Gets information about a user.
 welcome | Configures a welcome message.
 
