@@ -474,31 +474,78 @@ function purge(content, message)
 end
 
 function hug(_, message)
-	entry.hug = actionSet(message, entry.hug, 'hug', 'https://media.discordapp.net/attachments/711769236183187556/742504457518055484/image1.gif')
+	image = {
+		'https://media.discordapp.net/attachments/711769236183187556/742504457518055484/image1.gif',
+		'https://images-ext-1.discordapp.net/external/3VcBYcpBYmXk4hkCSv198n_e_OxgZHnORCKytR0Q53w/https/cdn.weeb.sh/images/S1gUsu_Qw-.gif',
+		'https://cdn.weeb.sh/images/SJfEks3Rb.gif',
+		'https://cdn.weeb.sh/images/BJ0sOOmDZ.gif',
+		'https://cdn.weeb.sh/images/HyNJIaVCb.gif',
+		'https://cdn.weeb.sh/images/BkotddXD-.gif',
+		'https://cdn.weeb.sh/images/rkV6r56Oz.gif'
+	}
+	entry.hug = actionSet(message, entry.hug, 'hug', image)
 end
 
 function pat(_, message)
-	entry.pat = actionSet(message, entry.pat, 'pat', 'https://cdn.discordapp.com/attachments/711769236183187556/742504456419016714/image0.gif')
+	image = {
+		'https://cdn.discordapp.com/attachments/711769236183187556/742504456419016714/image0.gif',
+		'https://cdn.weeb.sh/images/rktgg1Yv-.gif',
+		'https://cdn.weeb.sh/images/BkaRWA4CZ.gif',
+		'https://cdn.weeb.sh/images/SJmW1RKtb.gif',
+		'https://cdn.weeb.sh/images/H1jgekFwZ.gif',
+		'https://cdn.weeb.sh/images/BJnD9a4Rb.gif',
+		'https://cdn.weeb.sh/images/SktIxo20b.gif',
+		'https://cdn.weeb.sh/images/rkl1xJYDZ.gif'
+	}
+	entry.pat = actionSet(message, entry.pat, 'pat', image)
 end
 
 function kiss(_, message)
-	entry.kiss = actionSet(message, entry.kiss, 'kiss', 'https://cdn.discordapp.com/attachments/711769236183187556/743240532955758592/ByTBhp_vZ.gif')
+	image = {
+		'https://cdn.discordapp.com/attachments/711769236183187556/743240532955758592/ByTBhp_vZ.gif',
+		'https://cdn.weeb.sh/images/S1PCJWASf.gif',
+		'https://cdn.weeb.sh/images/SJrBZrMBz.gif'
+	}
+	entry.kiss = actionSet(message, entry.kiss, 'kiss', image)
 end
 
 function snuggle(_, message)
-	entry.snuggle = actionSet(message, entry.snuggle, 'cuddle', 'https://cdn.discordapp.com/attachments/711769236183187556/743239317660631141/tenor.gif')
+	image = {
+		'https://cdn.discordapp.com/attachments/711769236183187556/743239317660631141/tenor.gif',
+		'https://cdn.weeb.sh/images/ryPix0Ft-.gif',
+		'https://cdn.weeb.sh/images/ByXs1AYKW.gif',
+		'https://cdn.weeb.sh/images/SJLkLImPb.gif'
+	}
+	entry.snuggle = actionSet(message, entry.snuggle, 'cuddle', image)
 end
 
 function slap(_, message)
-	entry.slap = actionSet(message, entry.slap, 'slap', 'https://cdn.discordapp.com/attachments/711769236183187556/743236803514990592/SJdXoVguf.gif')
+	image = {
+		'https://cdn.discordapp.com/attachments/711769236183187556/743236803514990592/SJdXoVguf.gif',
+		'https://cdn.weeb.sh/images/SJx7M0Ft-.gif',
+		'https://cdn.weeb.sh/images/B1fnQyKDW.gif',
+		'https://cdn.weeb.sh/images/HkA6mJFP-.gif'
+	}
+	entry.slap = actionSet(message, entry.slap, 'slap', image)
 end
 
 function lick(_, message)
-	entry.lick = actionSet(message, entry.lick, 'lick', 'https://cdn.discordapp.com/attachments/711769236183187556/743234733785481367/Syg8gx0OP-.gif')
+	image = {
+		'https://cdn.discordapp.com/attachments/711769236183187556/743234733785481367/Syg8gx0OP-.gif',
+		'https://cdn.weeb.sh/images/ryGpGsnAZ.gif',
+		'https://cdn.weeb.sh/images/Bkagl0uvb.gif',
+		'https://cdn.weeb.sh/images/S1Ill0_vW.gif'
+	}
+	entry.lick = actionSet(message, entry.lick, 'lick', image)
 end
 
 function poke(_, message)
-	entry.poke = actionSet(message, entry.poke, 'poke', 'https://cdn.discordapp.com/attachments/711769236183187556/743858315460739102/HJZpLxkKDb.gif')
+	image = {
+		'https://cdn.discordapp.com/attachments/711769236183187556/743858315460739102/HJZpLxkKDb.gif',
+		'https://cdn.weeb.sh/images/SyQzRaFFb.gif',
+		'https://cdn.weeb.sh/images/rJ0hlsnR-.gif'
+	}
+	entry.poke = actionSet(message, entry.poke, 'poke', image)
 end
 
 
@@ -570,7 +617,7 @@ function actionSet(message, val, action, image)
 		val.type = 'embed'
 		val.content = {
 			description = '**' .. target.name:gsub('^%l', string.upper).. '**, you got a ' .. action .. ' from **' .. message.author.name .. '**',
-			image = {url = image .. '?size=1024'}
+			image = {url = image[math.random(#image)] .. '?size=1024'}
 		}
 		return val
 	end
