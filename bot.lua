@@ -47,7 +47,8 @@ client:on('ready', function()
 		snuggle = {alias = 'cuddle', description = 'Cuddle someone!', usage = 'snuggle [mention]', ftn = snuggle},
 		slap = {description = 'Slap someone!', usage = 'slap [mention]', ftn = slap},
 		lick = {description = 'Lick someone!', usage = 'lick [mention]', ftn = lick},
-		poke = {description = 'Poke someone!', usage = 'poke [mention]', ftn = poke}
+		poke = {description = 'Poke someone!', usage = 'poke [mention]', ftn = poke},
+		eightball = {type = 'message', alias = '8ball', description = 'Ask a question!', usage = 'eightball [question]', ftn = eightball}
 	}
 
 	-- alphabetize
@@ -548,6 +549,32 @@ function poke(_, message)
 	entry.poke = actionSet(message, entry.poke, 'poke', image)
 end
 
+function eightball()
+	local answers = {
+		'It is certain.',
+		'It is decidedly so.',
+		'Without a doubt.',
+		'Yes—definitely.',
+		'You may rely on it.',
+		'As I see it, yes.',
+		'Most likely.',
+		'Outlook good.',
+		'Yes.',
+		'Signs point to yes.',
+		'Reply hazy, try again.',
+		'Ask again later.',
+		'Better not tell you now.',
+		'Cannot predict now.',
+		'Concentrate and ask again.',
+		'Don\'t count on it.',
+		'My reply is no.',
+		'My sources say no.',
+		'Outlook not so good.',
+		'Very doubtful'
+	}
+	entry.eightball.content = answers[math.random(#answers)]
+	
+end
 
 -- send the message
 function output(key, channel, message, bot)
