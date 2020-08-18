@@ -377,7 +377,7 @@ function remind(content, message)
 				duration[key] = 0
 			end
 		end
-		local text = content:match('%d+%.?%d*[hms]%s*(.-)$')
+		local text = content:match('%d+%.?%d*[hms]%s+(.-)$')
 		if not text then
 			text = ''
 		end
