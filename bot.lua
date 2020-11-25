@@ -45,10 +45,11 @@ client:on('ready', function()
 		pat = {description = 'Pat someone!', usage = 'pat [mention]', ftn = pat},
 		kiss = {description = 'Kiss someone!', usage = 'kiss [mention]', ftn = kiss},
 		snuggle = {alias = 'cuddle', description = 'Cuddle someone!', usage = 'snuggle [mention]', ftn = snuggle},
-		slap = {description = 'Slap someone!', usage = 'slap [mention]', ftn = slap},
+		slap = {alias = 'smack', description = 'Slap someone!', usage = 'slap [mention]', ftn = slap},
 		lick = {description = 'Lick someone!', usage = 'lick [mention]', ftn = lick},
 		poke = {description = 'Poke someone!', usage = 'poke [mention]', ftn = poke},
-		eightball = {type = 'message', alias = '8ball', description = 'Ask a question!', usage = 'eightball [question]', ftn = eightball}
+		eightball = {type = 'message', alias = '8ball', description = 'Ask a question!', usage = 'eightball [question]', ftn = eightball},
+		ship = {type = 'message', description = 'Rates your OTP.', usage = 'ship [mention][mention]', ftn = ship}
 	}
 
 	-- alphabetize
@@ -475,20 +476,23 @@ function purge(content, message)
 end
 
 function hug(_, message)
-	image = {
+	local image = {
 		'https://media.discordapp.net/attachments/711769236183187556/742504457518055484/image1.gif',
 		'https://images-ext-1.discordapp.net/external/3VcBYcpBYmXk4hkCSv198n_e_OxgZHnORCKytR0Q53w/https/cdn.weeb.sh/images/S1gUsu_Qw-.gif',
 		'https://cdn.weeb.sh/images/SJfEks3Rb.gif',
 		'https://cdn.weeb.sh/images/BJ0sOOmDZ.gif',
 		'https://cdn.weeb.sh/images/HyNJIaVCb.gif',
 		'https://cdn.weeb.sh/images/BkotddXD-.gif',
-		'https://cdn.weeb.sh/images/rkV6r56Oz.gif'
+		'https://cdn.weeb.sh/images/rkV6r56Oz.gif',
+		'https://cdn.zerotwo.dev/HUG/48e58677-7687-4826-bb0c-cd76a7e8c34c.gif',
+		'https://cdn.zerotwo.dev/HUG/3cd66917-ea19-4aca-96ba-448c814d28ec.gif',
+		'https://cdn.zerotwo.dev/HUG/d856f3fe-f220-41b6-b3c2-f0a2d956dd8a.gif'
 	}
 	entry.hug = actionSet(message, entry.hug, 'hug', image)
 end
 
 function pat(_, message)
-	image = {
+	local image = {
 		'https://cdn.discordapp.com/attachments/711769236183187556/742504456419016714/image0.gif',
 		'https://cdn.weeb.sh/images/rktgg1Yv-.gif',
 		'https://cdn.weeb.sh/images/BkaRWA4CZ.gif',
@@ -496,42 +500,51 @@ function pat(_, message)
 		'https://cdn.weeb.sh/images/H1jgekFwZ.gif',
 		'https://cdn.weeb.sh/images/BJnD9a4Rb.gif',
 		'https://cdn.weeb.sh/images/SktIxo20b.gif',
-		'https://cdn.weeb.sh/images/rkl1xJYDZ.gif'
+		'https://cdn.weeb.sh/images/rkl1xJYDZ.gif',
+		'https://cdn.zerotwo.dev/PAT/c293da47-09df-4609-a46a-960b2a0b4df6.gif',
+		'https://cdn.zerotwo.dev/PAT/524de90e-0997-41b0-bdce-f14e0821a7be.gif',
+		'https://cdn.zerotwo.dev/PAT/91d42571-417b-4130-98b7-c5e653ea6cc4.gif',
+		'https://cdn.zerotwo.dev/PAT/18eb4077-a133-4865-9c2d-e2c5e42b908e.gif'
 	}
 	entry.pat = actionSet(message, entry.pat, 'pat', image)
 end
 
 function kiss(_, message)
-	image = {
+	local image = {
 		'https://cdn.discordapp.com/attachments/711769236183187556/743240532955758592/ByTBhp_vZ.gif',
 		'https://cdn.weeb.sh/images/S1PCJWASf.gif',
-		'https://cdn.weeb.sh/images/SJrBZrMBz.gif'
+		'https://cdn.weeb.sh/images/SJrBZrMBz.gif',
+		'https://cdn.zerotwo.dev/CUDDLE/f5dde9fa-d1bc-4a7c-a283-70b8f8527f83.gif',
+		'https://cdn.zerotwo.dev/KISS/ecba70af-7f81-4541-ab00-f44b5c05c14f.gif'
 	}
 	entry.kiss = actionSet(message, entry.kiss, 'kiss', image)
 end
 
 function snuggle(_, message)
-	image = {
+	local image = {
 		'https://cdn.discordapp.com/attachments/711769236183187556/743239317660631141/tenor.gif',
 		'https://cdn.weeb.sh/images/ryPix0Ft-.gif',
 		'https://cdn.weeb.sh/images/ByXs1AYKW.gif',
-		'https://cdn.weeb.sh/images/SJLkLImPb.gif'
+		'https://cdn.weeb.sh/images/SJLkLImPb.gif',
+		'https://cdn.zerotwo.dev/HUG/785e84f6-4cd2-4fe1-8b1c-a5c4756ca918.gif'
 	}
 	entry.snuggle = actionSet(message, entry.snuggle, 'cuddle', image)
 end
 
 function slap(_, message)
-	image = {
+	local image = {
 		'https://cdn.discordapp.com/attachments/711769236183187556/743236803514990592/SJdXoVguf.gif',
 		'https://cdn.weeb.sh/images/SJx7M0Ft-.gif',
 		'https://cdn.weeb.sh/images/B1fnQyKDW.gif',
-		'https://cdn.weeb.sh/images/HkA6mJFP-.gif'
+		'https://cdn.weeb.sh/images/HkA6mJFP-.gif',
+		'https://cdn.zerotwo.dev/SLAP/ee77ff1d-325b-4495-950b-b29978aa8c92.gif',
+		'https://cdn.zerotwo.dev/SLAP/cf972400-4ce4-4a3a-8fbf-33d1bc5f142f.gif'
 	}
 	entry.slap = actionSet(message, entry.slap, 'slap', image)
 end
 
 function lick(_, message)
-	image = {
+	local image = {
 		'https://cdn.discordapp.com/attachments/711769236183187556/743234733785481367/Syg8gx0OP-.gif',
 		'https://cdn.weeb.sh/images/ryGpGsnAZ.gif',
 		'https://cdn.weeb.sh/images/Bkagl0uvb.gif',
@@ -541,7 +554,7 @@ function lick(_, message)
 end
 
 function poke(_, message)
-	image = {
+	local image = {
 		'https://cdn.discordapp.com/attachments/711769236183187556/743858315460739102/HJZpLxkKDb.gif',
 		'https://cdn.weeb.sh/images/SyQzRaFFb.gif',
 		'https://cdn.weeb.sh/images/rJ0hlsnR-.gif'
@@ -573,7 +586,21 @@ function eightball()
 		'Very doubtful'
 	}
 	entry.eightball.content = answers[math.random(#answers)]
-	
+end
+
+function ship()
+	local rate = math.random(9)
+	if rate > 8 then
+		entry.ship.content = '💖💖💖 A match made in heaven 💖💖💖'
+	else if rate > 6 then
+		entry.ship.content = '💞💞 What a cute couple! 💞💞'
+	else if rate > 3 then
+		entry.ship.content = '❤️ They could have so much fun together~ ❤️'
+	else if rate > 1 then
+		entry.ship.content = 'It\'s worth a shot 😘'
+	else
+		entry.ship.content = '💔 This ship…has sunk 💔'
+	end	
 end
 
 -- send the message
