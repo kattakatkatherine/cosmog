@@ -9,6 +9,7 @@ Command | Function
 ------- | --------
 coin | Flips a coin.
 dice | Rolls dice.
+eightball | Ask a question!
 emote | Gets an emote as an image.
 filter | Manages the list of filtered words.
 help | Gets a list of commands.
@@ -27,6 +28,7 @@ random | Gets a random number between two integers.
 remind | Sets a reminder.
 say | Says something.
 server | Gets information about the server.
+ship | Rates your OTP.
 slap | Slap someone!
 snuggle | Cuddle someone!
 user | Gets information about a user.
