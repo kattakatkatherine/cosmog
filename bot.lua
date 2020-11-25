@@ -592,11 +592,11 @@ function ship()
 	local rate = math.random(9)
 	if rate > 8 then
 		entry.ship.content = '💖💖💖 A match made in heaven 💖💖💖'
-	else if rate > 6 then
+	elseif rate > 6 then
 		entry.ship.content = '💞💞 What a cute couple! 💞💞'
-	else if rate > 3 then
+	elseif rate > 3 then
 		entry.ship.content = '❤️ They could have so much fun together~ ❤️'
-	else if rate > 1 then
+	elseif rate > 1 then
 		entry.ship.content = 'It\'s worth a shot 😘'
 	else
 		entry.ship.content = '💔 This ship…has sunk 💔'
