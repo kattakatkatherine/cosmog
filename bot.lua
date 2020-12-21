@@ -133,6 +133,13 @@ client:on('messageCreate', function(message)
 			return
 		end
 	end
+
+    -- set a reminder when the server is bumped
+    if message.content:find('^!d bump') then
+        remind('reminder 2h bump', message)
+        output('remind', message.channel, message)
+    end
+
 end)
 
 -- send welcome message
@@ -202,7 +209,7 @@ function user(_, message, content)
 	local options = {
 		avatar = {type = 'image', content = target:getAvatarURL(), fail = 'an avatar'},
 		age = {type = 'message', content = os.date(target.tag:gsub('^%l', string.upper) .. ' created their account on %b %d, %Y at %H:%M.', target.createdAt)},
-		join = {type = 'message', content = os.date(target.tag:gsub('^%l', string.upper) .. ' joined the server on %b %d, %Y at %H:%M.', target.joinedAt)}
+		join = {type = 'message', content = os.date(target.tag:gsub('^%l', string.upper) .. ' joined the server on %b %d, %Y at %H:%M.', string.format('%d', date(message.member.joinedAt)))}
 	}
 
 	for key, val in pairs(options) do
@@ -648,6 +655,22 @@ function read(server, option, default)
 
 	file:close()
 	return variable
+end
+
+-- parse a date
+function date(json_date)
+    local pattern = "(%d+)%-(%d+)%-(%d+)%a(%d+)%:(%d+)%:([%d%.]+)([Z%+%-])(%d?%d?)%:?(%d?%d?)"
+    local year, month, day, hour, minute, 
+        seconds, offsetsign, offsethour, offsetmin = json_date:match(pattern)
+    local timestamp = os.time{year = year, month = month, 
+        day = day, hour = hour, min = minute, sec = seconds}
+    local offset = 0
+    if offsetsign ~= 'Z' then
+      offset = tonumber(offsethour) * 60 + tonumber(offsetmin)
+      if xoffset == "-" then offset = offset * -1 end
+    end
+    
+    return timestamp + offset
 end
 
 -- set from an options table
