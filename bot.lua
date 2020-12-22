@@ -89,6 +89,11 @@ client:on('messageCreate', function(message)
 		write(message.guild.id, 'filter', {})
 	end
 
+    -- automatic bump reminder
+    if message.author.id == '302050872383242240' then
+        message:addReaction('👍')
+    end
+
 	-- do not respond to bots
 	if message.author.bot then
 		return
@@ -129,17 +134,10 @@ client:on('messageCreate', function(message)
 			end
 
 			-- send message
-			output(key, message.channel, message)
+			output(key, message.channel, message, message.author)
 			return
 		end
 	end
-
-    -- set a reminder when the server is bumped
-    if message.content:find('^!d bump') then
-        remind('reminder 2h bump', message)
-        output('remind', message.channel, message)
-    end
-
 end)
 
 -- send welcome message
@@ -151,6 +149,19 @@ client:on('memberJoin', function(member)
 		entry.blank.content = welcomeMessage:gsub('%$server%$', member.guild.name):gsub('%$user%$', member.user.mentionString)
 		output('blank', client:getChannel(welcomeChannel))
 	end
+end)
+
+-- automatic bump reminder
+client:on('reactionAdd', function(reaction, userId)
+    if reaction.message.author.id == '302050872383242240' and reaction.emojiName == '👍' and not reaction.message.guild:getMember(userId).bot then
+        local length = reaction.message.embed.description:match('another (.+) minutes')
+        if not length then
+            length = 120
+        end
+        print(length)
+        remind('reminder ' .. length .. 'm bump', reaction.message, _, reaction.message.guild:getMember(userId))
+        output('remind', reaction.message.channel, reaction.message)
+    end
 end)
 
 -- restore nickname upon rejoining a server
@@ -374,7 +385,7 @@ function welcome(content, message)
 	write(server, 'welcomeMessage', welcomeMessage)
 end
 
-function remind(content, message)
+function remind(content, message, _, author)
 	if content:find('%d+%.?%d*[hms]') then
 		entry.remind.content = 'Your reminder has been set!'
 		output('remind', message.channel, message, message.guild:getMember(client.user.id))
@@ -392,7 +403,7 @@ function remind(content, message)
 		end
 
 		timer.sleep(duration[1] * 3600000 + duration[2] * 60000 + duration[3] * 1000) -- convert to milliseconds
-		entry.remind.content = '**Reminder** ' .. message.author.mentionString .. ' '.. text
+		entry.remind.content = '**Reminder** ' .. author.mentionString .. ' '.. text
 	else
 		entry.remind.content = 'When would you like me to remind you?'
 	end
