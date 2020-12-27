@@ -154,10 +154,14 @@ end)
 -- automatic bump reminder
 client:on('reactionAdd', function(reaction, userId)
     if reaction.message.author.id == '302050872383242240' and reaction.emojiName == '👍' and not reaction.message.guild:getMember(userId).bot then
-        local length = reaction.message.embed.description:match('another (.+) minutes')
-        if not length then
+        local length = reaction.message.embed.description:match('another (.+) minute')
+        if reaction.message.embed.description:match('Bump done') then
             length = 120
         end
+        if not length then
+            return
+        end
+        length = length - math.floor((os.time() - reaction.message.createdAt)/60)
         print(length)
         remind('reminder ' .. length .. 'm bump', reaction.message, _, reaction.message.guild:getMember(userId))
         output('remind', reaction.message.channel, reaction.message)
