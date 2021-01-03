@@ -162,6 +162,9 @@ client:on('reactionAdd', function(reaction, userId)
             return
         end
         length = length - math.floor((os.time() - reaction.message.createdAt)/60)
+        if length < 0 then
+            return
+        end
         print(length)
         remind('reminder ' .. length .. 'm bump', reaction.message, _, reaction.message.guild:getMember(userId))
         output('remind', reaction.message.channel, reaction.message)
