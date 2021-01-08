@@ -130,11 +130,11 @@ client:on('messageCreate', function(message)
 
 			-- dynamic commands
 			if val.ftn then
-				val.ftn(cleanContent, message, cleanContent:lower())
+				val.ftn(cleanContent, message, cleanContent:lower(), message.author)
 			end
 
 			-- send message
-			output(key, message.channel, message, message.author)
+			output(key, message.channel, message)
 			return
 		end
 	end
