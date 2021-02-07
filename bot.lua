@@ -90,7 +90,7 @@ client:on('messageCreate', function(message)
 	end
 
     -- automatic bump reminder
-    if message.author.id == '302050872383242240' && (message.embed.description:match('another .+ minute') || message.embed.description:match('👍')) then
+    if message.author.id == '302050872383242240' and (message.embed.description:match('another .+ minute') or message.embed.description:match('👍')) then
         message:addReaction('👍')
     end
 
