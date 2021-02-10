@@ -90,7 +90,7 @@ client:on('messageCreate', function(message)
 	end
 
     -- automatic bump reminder
-    if message.author.id == '302050872383242240' and (message.embed.description:match('another .+ minute') or message.embed.description:match('👍')) then
+    if message.author.id == '302050872383242240' and (message.embed.description:match('another .+ minute') or message.embed.description:match('Bump done')) then
         message:addReaction('👍')
     end
 
@@ -155,7 +155,7 @@ end)
 client:on('reactionAdd', function(reaction, userId)
     if reaction.message.author.id == '302050872383242240' and reaction.emojiName == '👍' and not reaction.message.guild:getMember(userId).bot then
         local length = reaction.message.embed.description:match('another (.+) minute')
-        if reaction.message.embed.description:match('👍') then
+        if reaction.message.embed.description:match('Bump done') then
             length = 120
         end
         if not length then
