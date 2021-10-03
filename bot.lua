@@ -5,7 +5,6 @@ local client = discordia.Client()
 
 --[[
 	Cosmog
-	Katherine Gearhart
 	June 2020
 ]]
 
