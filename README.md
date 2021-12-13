@@ -52,8 +52,8 @@ welcome | Configures a welcome message.
     1. Use the provided link to invite the bot.
     1. Navigate to the "General Information" tab.
     1. Copy the "Client Secret."
-1. Download and configure [Cosmog](https://github.com/katherine-gearhart/cosmog.git).
-    1. Download Cosmog with `git clone https://github.com/katherine-gearhart/cosmog.git`.
+1. Download and configure [Cosmog](https://github.com/kattakatkatherine/cosmog.git).
+    1. Download Cosmog with `git clone https://github.com/kattakatkatherine/cosmog.git`.
     1. Navigate to the folder with `cd cosmog`.
     1. Open the configuration file with `nano config.json`.
     1. Paste the "Client Secret" into the "Token" slot.
